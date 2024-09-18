@@ -6,7 +6,7 @@
 
 using namespace std;
 mutex mtx;
-int numToGrabNext = 4;
+int numToGrabNext = 2;
 int minimum = 0;
 /*def isPrime(n):
     if n % 2 == 0:
@@ -42,13 +42,30 @@ void goldBach(int seconds)
 {
     time_t start = time(0); // got this use of time_t to act as a timer from: https://stackoverflow.com/questions/3913074/calling-a-function-for-a-period-of-time
     time_t now = time(0);
-    int max = 0;
+
     while ((now - start) <= seconds)
     {
         now = time(0);
-        for (int prime1 = 3; prime1 <= numToGrabNext / 2; prime1 += 2)
+        mtx.lock();
+        int localNext = numToGrabNext;
+        mtx.unlock();
+        if (localNext == 2)
         {
-            int prime2 = numToGrabNext - prime1;
+            mtx.lock();
+            numToGrabNext += 2;
+            cout << "2 1 1\n";
+            mtx.unlock();
+        }
+        else if (localNext == 4)
+        {
+            mtx.lock();
+            numToGrabNext += 2;
+            cout << "4 1 3\n";
+            mtx.unlock();
+        }
+        for (int prime1 = 3; prime1 <= localNext / 2; prime1 += 2)
+        {
+            int prime2 = localNext - prime1;
             cout << "testing " << prime1 << " and " << prime2 << endl;
             if (isPrime(prime1) && isPrime(prime2))
             {
@@ -56,20 +73,16 @@ void goldBach(int seconds)
                 if (prime1 > minimum)
                 {
                     minimum = prime1;
-    
-                    cout << numToGrabNext + " ";
-                    cout << minimum + " ";
-                    cout << prime2 + "\n";
 
+                    cout << localNext << " ";
+                    cout << minimum << " ";
+                    cout << prime2 << "\n";
                 }
+                numToGrabNext += 2;
                 mtx.unlock();
                 break;
             }
         }
-
-        mtx.lock();
-        numToGrabNext += 2;
-        mtx.unlock();
     }
 }
 
