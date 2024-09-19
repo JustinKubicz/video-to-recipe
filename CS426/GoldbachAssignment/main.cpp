@@ -8,23 +8,7 @@ using namespace std;
 mutex mtx;
 int numToGrabNext = 2;
 int minimum = 0;
-/*def isPrime(n):
-    if n % 2 == 0:
-        return False
-    for factor in range(3, int(sqrt(n))+1, 2):
-        if n % factor == 0:
-            return False
-    return True
 
-    for candidate in range(start, end, 2):
-    for prime1 in range(3, candidate//2+1, 2):
-        prime2 = candidate - prime1
-        print("Testing ", prime1, " ", prime2)
-        if isPrime(prime1) and isPrime(prime2):
-            if prime1 > max:
-                max = prime1
-                print(candidate, prime1, prime2)
-            break*/
 bool isPrime(int n)
 {
     if (n % 2 == 0)
@@ -66,7 +50,6 @@ void goldBach(int seconds)
         for (int prime1 = 3; prime1 <= localNext / 2; prime1 += 2)
         {
             int prime2 = localNext - prime1;
-            cout << "testing " << prime1 << " and " << prime2 << endl;
             if (isPrime(prime1) && isPrime(prime2))
             {
                 mtx.lock();
@@ -78,11 +61,20 @@ void goldBach(int seconds)
                     cout << minimum << " ";
                     cout << prime2 << "\n";
                 }
-                numToGrabNext += 2;
+                /*int temp = prime1;
+                if ((temp += 2) > localNext/2)
+                {
+                
+                    numToGrabNext += 2;
+                    mtx.unlock();
+                    break;
+                }*/
                 mtx.unlock();
-                break;
             }
         }
+        mtx.lock();
+        numToGrabNext += 2;
+        mtx.unlock();
     }
 }
 
