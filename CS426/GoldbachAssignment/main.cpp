@@ -3,7 +3,22 @@
 #include <mutex>
 #include <time.h>
 #include <math.h>
+/*4 2 2
+8 3 5
+12 5 7
+18 7 11
+24 11 13
+30 13 17
+36 17 19
+42 19 23
+52 23 29
+60 29 31
+68 31 37
+78 37 41
+84 41 43
+90 43 47
 
+Okay, I think I fixed it. No repeated minimums, and no duplicate primes, took 2 logic out, no longer double increments on numToGrabNext on 4. 9/22/2024 */
 using namespace std;
 mutex mtx;
 int numToGrabNext = 2;
@@ -22,7 +37,7 @@ bool isPrime(int n)
     }
     return true;
 }
-void goldBach(int seconds)
+void goldBach(double seconds)
 {
     time_t start = time(0); // got this use of time_t to act as a timer from: https://stackoverflow.com/questions/3913074/calling-a-function-for-a-period-of-time
     time_t now = time(0);
@@ -33,48 +48,40 @@ void goldBach(int seconds)
         mtx.lock();
         int localNext = numToGrabNext;
         mtx.unlock();
-        if (localNext == 2)
+
+        if (localNext == 4)
         {
             mtx.lock();
             numToGrabNext += 2;
-            cout << "2 1 1\n";
-            mtx.unlock();
-        }
-        else if (localNext == 4)
-        {
-            mtx.lock();
-            numToGrabNext += 2;
-            cout << "4 1 3\n";
+            cout << "4 2 2\n";
             mtx.unlock();
         }
         for (int prime1 = 3; prime1 <= localNext / 2; prime1 += 2)
         {
             int prime2 = localNext - prime1;
-            if (isPrime(prime1) && isPrime(prime2))
+            if (prime1 != prime2)
             {
-                mtx.lock();
-                if (prime1 > minimum)
+                if (isPrime(prime1) && isPrime(prime2))
                 {
-                    minimum = prime1;
+                    mtx.lock();
+                    if (prime1 > minimum)
+                    {
+                        minimum = prime1;
 
-                    cout << localNext << " ";
-                    cout << minimum << " ";
-                    cout << prime2 << "\n";
-                }
-                /*int temp = prime1;
-                if ((temp += 2) > localNext/2)
-                {
-                
-                    numToGrabNext += 2;
+                        cout << localNext << " ";
+                        cout << minimum << " ";
+                        cout << prime2 << "\n";
+                    }
                     mtx.unlock();
-                    break;
-                }*/
-                mtx.unlock();
+                }
             }
         }
-        mtx.lock();
-        numToGrabNext += 2;
-        mtx.unlock();
+        if (localNext != 4)
+        {
+            mtx.lock();
+            numToGrabNext += 2;
+            mtx.unlock();
+        }
     }
 }
 
@@ -86,7 +93,7 @@ int main()
     cin >> threads;
     cout << endl;
     cout << "For how many seconds?: ";
-    int seconds;
+    double seconds;
     cin >> seconds;
     cout << "\n";
     thread *ar = new thread[threads];
