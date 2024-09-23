@@ -3,22 +3,7 @@
 #include <mutex>
 #include <time.h>
 #include <math.h>
-/*4 2 2
-8 3 5
-12 5 7
-18 7 11
-24 11 13
-30 13 17
-36 17 19
-42 19 23
-52 23 29
-60 29 31
-68 31 37
-78 37 41
-84 41 43
-90 43 47
 
-Okay, I think I fixed it. No repeated minimums, and no duplicate primes, took 2 logic out, no longer double increments on numToGrabNext on 4. 9/22/2024 */
 using namespace std;
 mutex mtx;
 int numToGrabNext = 2;
@@ -73,6 +58,7 @@ void goldBach(double seconds)
                         cout << prime2 << "\n";
                     }
                     mtx.unlock();
+                    break;
                 }
             }
         }
