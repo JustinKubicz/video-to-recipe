@@ -6,7 +6,7 @@
 
 using namespace std;
 mutex mtx;
-int numToGrabNext = 2;
+int numToGrabNext = 6;
 int minimum = 0;
 
 bool isPrime(int n)
@@ -36,6 +36,11 @@ void goldBach(double seconds)
 
         for (int prime1 = 3; prime1 <= localNext / 2; prime1 += 2)
         { // weird stuff happening after 30, when 7 is tried again, we're restarting
+            now = time(0);
+            if ((now - start) >= seconds)
+            {
+                break;
+            }
             int prime2 = localNext - prime1;
             if (isPrime(prime1) && isPrime(prime2))
             {
