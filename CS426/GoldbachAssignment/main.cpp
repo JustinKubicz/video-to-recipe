@@ -35,7 +35,7 @@ void goldBach(double seconds)
         mtx.unlock();
 
         for (int prime1 = 3; prime1 <= localNext / 2; prime1 += 2)
-        { // weird stuff happening after 30, when 7 is tried again, we're restarting
+        {
             now = time(0);
             if ((now - start) >= seconds)
             {
@@ -53,6 +53,7 @@ void goldBach(double seconds)
                     cout << minimum << " ";
                     cout << prime2 << "\n";
                 }
+
                 mtx.unlock();
                 break;
             }
