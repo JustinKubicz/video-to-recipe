@@ -34,40 +34,27 @@ void goldBach(double seconds)
         int localNext = numToGrabNext;
         mtx.unlock();
 
-        if (localNext == 4)
-        {
-            mtx.lock();
-            numToGrabNext += 2;
-            cout << "4 2 2\n";
-            mtx.unlock();
-        }
         for (int prime1 = 3; prime1 <= localNext / 2; prime1 += 2)
-        {//weird stuff happening after 30, when 7 is tried again, we're restarting
+        { // weird stuff happening after 30, when 7 is tried again, we're restarting
             int prime2 = localNext - prime1;
-            if (prime1 != prime2)
+            if (isPrime(prime1) && isPrime(prime2))
             {
-                if (isPrime(prime1) && isPrime(prime2))
+                mtx.lock();
+                if (prime1 > minimum)
                 {
-                    mtx.lock();
-                    if (prime1 > minimum)
-                    {
-                        minimum = prime1;
+                    minimum = prime1;
 
-                        cout << localNext << " ";
-                        cout << minimum << " ";
-                        cout << prime2 << "\n";
-                    }
-                    mtx.unlock();
-                    break;
+                    cout << localNext << " ";
+                    cout << minimum << " ";
+                    cout << prime2 << "\n";
                 }
+                mtx.unlock();
+                break;
             }
         }
-        if (localNext != 4)
-        {
-            mtx.lock();
-            numToGrabNext += 2;
-            mtx.unlock();
-        }
+        mtx.lock();
+        numToGrabNext += 2;
+        mtx.unlock();
     }
 }
 
