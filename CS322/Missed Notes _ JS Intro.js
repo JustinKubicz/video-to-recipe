@@ -15,3 +15,11 @@ bob = {
 }
 bob.speak();
 
+function Student(name, major){
+    this.name = name;
+    this.major = major;
+    return major;
+}
+
+let clown = new Student("Bozo", "Clowning");
+let simp = { name: "sideShowBob", major: "Clowning"};

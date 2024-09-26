@@ -6,6 +6,7 @@
 
 using namespace std;
 mutex mtx;
+mutex mtx2;
 int numToGrabNext = 6;
 int minimum = 0;
 
@@ -44,7 +45,7 @@ void goldBach(double seconds)
             int prime2 = localNext - prime1;
             if (isPrime(prime1) && isPrime(prime2))
             {
-                mtx.lock();
+                mtx2.lock();
                 if (prime1 > minimum)
                 {
                     minimum = prime1;
@@ -54,7 +55,7 @@ void goldBach(double seconds)
                     cout << prime2 << "\n";
                 }
 
-                mtx.unlock();
+                mtx2.unlock();
                 break;
             }
         }
