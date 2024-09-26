@@ -33,6 +33,7 @@ void goldBach(double seconds)
         now = time(0);
         mtx.lock();
         int localNext = numToGrabNext;
+        numToGrabNext+=2;
         mtx.unlock();
 
         for (int prime1 = 3; prime1 <= localNext / 2; prime1 += 2)
@@ -59,9 +60,6 @@ void goldBach(double seconds)
                 break;
             }
         }
-        mtx.lock();
-        numToGrabNext += 2;
-        mtx.unlock();
     }
 }
 
