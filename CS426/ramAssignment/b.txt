@@ -1,0 +1,3 @@
+This is file b
+It has a few more bytes in it than
+file a had
