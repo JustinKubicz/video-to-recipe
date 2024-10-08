@@ -36,6 +36,10 @@ void openAndCopyInputBytes(int size, char *inputArray[], void *outPutPointer)
             throw "FAILED TO OPEN INPUT FILE";
         int sizeOfFile = getFileSize(inputArray[i]);
         void *inputPointer = mmap(NULL, sizeOfFile, PROT_READ, MAP_SHARED, inputFd, 0);
+        if (inputPointer == (void *)-1)
+            throw "MMAP FAILED";
+        if (madvise(inputPointer, sizeOfFile, MADV_SEQUENTIAL) == -1)
+            throw "MADVISE FAILED";
         void *copyPtr = memcpy(((char *)outPutPointer) + leftOff, inputPointer, sizeOfFile);
         if (copyPtr == (void *)-1)
             throw "MEMCPY() FAILED";
@@ -48,12 +52,12 @@ int main(int argc, char *argv[])
 {
     try
     {
-    
-        int inSize = getSizeOfInputFiles(argc - 1, argv); 
-     
+
+        int inSize = getSizeOfInputFiles(argc - 1, argv);
+
         // is output name going to be the last arg?
         int outFD = open(argv[argc - 1], O_RDWR | O_CREAT | O_EXCL); // open in R and W permissions, Create only if doesn't exist, otherwise error, size is the size of all inputs CHANGE BACK TO ARGV[ARGC - 1] after debug
-   
+
         ftruncate(outFD, inSize);
         if (outFD == -1)
             throw "FAILED TO OPEN OUTPUT FILE";
@@ -61,8 +65,10 @@ int main(int argc, char *argv[])
         void *outPtr = mmap(NULL, inSize, PROT_WRITE, MAP_SHARED, outFD, 0);
         if (outPtr == (void *)-1)
             throw "MMAP FAIL";
-        openAndCopyInputBytes(argc - 1, argv, outPtr); 
-     
+        if (madvise(outPtr, inSize, MADV_SEQUENTIAL) == -1)
+            throw "MADVISE FAILED";
+        openAndCopyInputBytes(argc - 1, argv, outPtr);
+
         munmap(outPtr, inSize);
         outFD = close(outFD);
     }
