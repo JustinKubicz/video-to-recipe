@@ -20,8 +20,6 @@ int getSizeOfInputFiles(int numFiles, char *arr[])
     {
         int stats = getFileSize(arr[i]);
         ans += stats;
-        int debugingTemp = stats;
-        cout << "size of " << arr[i] << " file: " << debugingTemp << " bytes" << endl;
     }
     return ans;
 }
