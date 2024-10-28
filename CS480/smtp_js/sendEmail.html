@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<!--API: https://smtpjs.com/
+from: https://www.youtube.com/watch?v=yP85ECOVMe8
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <style>
+    .container {
+      display: grid;
+      place-items: center;
+    }
+    .main {
+      background-color: #72619e;
+      width: 370px;
+      height: 470px;
+    }
+    form {
+      width: 350px;
+      height: 400px;
+    }
+    form label {
+      color: white;
+    }
+    .form-input {
+      margin-top: 10px;
+      font-size: 20px;
+      margin-left: 50px;
+    }
+    input {
+      width: 80%;
+      height: 30px;
+      border-radius: 10px;
+    }
+    .form-input button {
+      width: 120px;
+      height: 40px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+  </style>
+  <body>
+    <div class="container">
+      <h1>Working Contact From</h1>
+
+      <div class="main">
+        <form action=" ">
+          <div class="form-input">
+            <label for=""> Name </label><br />
+            <input type="text" placeholder="Enter your Name: " />
+          </div>
+          <div class="form-input">
+            <label for=""> Email </label><br />
+            <input type="text" placeholder="Enter your Email: " />
+          </div>
+
+          <div class="form-input">
+            <label for=""> Contact Number </label><br />
+            <input type="text" placeholder="Enter your Contact Number: " />
+          </div>
+
+          <div class="form-input">
+            <label for=""> Subject </label><br />
+            <input type="text" placeholder="Enter your subject: " />
+          </div>
+
+          <div class="form-input">
+            <label for=""> Messages</label>><br />
+            <textarea name="" id="" cols="31" rows="4"></textarea>
+          </div>
+          <div class="form-input">
+            <button type="button" onclick="SendEmail()">Send Email</button>
+          </div>
+        </form>
+      </div>
+      <!--
+        end main class
+        -->
+    </div>
+    <!--
+    end Container Class
+    -->
+    <script src="https://smtpjs.com/v3/smtp.js"></script>
+    <script>
+      function SendEmail() {
+        Email.send({
+          SecureToken: "4fb75eb2-b7be-4cf0-83e4-8096148d0fe6",
+          To: "justinkubicz@gmail.com",
+          From: "justinkubicz@gmail.com",
+          Subject: "This is the subject",
+          Body: "And this is the body",
+        }).then((message) => alert(message));
+      }
+    </script>
+  </body>
+</html>

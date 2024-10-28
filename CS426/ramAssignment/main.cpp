@@ -16,7 +16,7 @@ int getFileSize(char *name)
 int getSizeOfInputFiles(int numFiles, char *arr[])
 {
     int ans = 0;
-    for (int i = 0; i < numFiles; i++)
+    for (int i = 1; i < numFiles; i++)
     {
         int stats = getFileSize(arr[i]);
         ans += stats;
@@ -27,7 +27,7 @@ int getSizeOfInputFiles(int numFiles, char *arr[])
 void openAndCopyInputBytes(int size, char *inputArray[], void *outPutPointer)
 {
     int leftOff = 0;
-    for (int i = 0; i < size; i++)
+    for (int i = 1; i < size; i++)
     {
         int inputFd = open(inputArray[i], O_RDONLY);
         if (inputFd == -1)
@@ -50,17 +50,15 @@ int main(int argc, char *argv[])
 {
     try
     {
-
         int inSize = getSizeOfInputFiles(argc - 1, argv);
-
-        // is output name going to be the last arg?
         int outFD = open(argv[argc - 1], O_RDWR | O_CREAT | O_EXCL); // open in R and W permissions, Create only if doesn't exist, otherwise error, size is the size of all inputs CHANGE BACK TO ARGV[ARGC - 1] after debug
-
         ftruncate(outFD, inSize);
         if (outFD == -1)
             throw "FAILED TO OPEN OUTPUT FILE";
 
         void *outPtr = mmap(NULL, inSize, PROT_WRITE, MAP_SHARED, outFD, 0);
+        if (chmod(argv[argc - 1], S_IWUSR | S_IRUSR) == -1)
+            throw "FAILED TO SET PERMISSIONS ON OUTPUT FILE";
         if (outPtr == (void *)-1)
             throw "MMAP FAIL";
         if (madvise(outPtr, inSize, MADV_SEQUENTIAL) == -1)
