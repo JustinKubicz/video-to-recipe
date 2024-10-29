@@ -16,6 +16,7 @@
         test 3 terminates before final expected output: ./test3 (d)
 
 */
+unsigned long totalSize = 0;
 unsigned long visited[1000];
 using namespace std;
 bool searchAr(auto ar[], auto ino)
@@ -43,13 +44,12 @@ void doDir(DIR *dir, char *path)
         char *fullPath = strcat(tempStr, "/");
         fullPath = strcat(fullPath, de->d_name);
         // full path stuff might need to move to the end of this while. I believe everything will process as a directory with the way it's currently configured
-        for (int i = 0; i < strlen(fullPath); i++)
-        {
-            cout << fullPath[i];
-        }
+
         lstat(fullPath, &statbuf);
+        mode_t m = statbuf.st_mode;
+        totalSize += statbuf.st_size;
         unsigned long ino = statbuf.st_ino;
-        // if (!searchAr(visited, ino))
+        // if (!searchAr(visited, ino)) removed the visited condition for the sake of time. If I have time to revisit, I'll try to reimplement
         // {
         for (int i = 0; i < sizeof(visited); i++)
         {
@@ -59,7 +59,6 @@ void doDir(DIR *dir, char *path)
                 break;
             }
         }
-        mode_t m = statbuf.st_mode;
 
         string typeStr = "";
         if (S_ISDIR(m))
@@ -69,17 +68,26 @@ void doDir(DIR *dir, char *path)
             if (!(name[0] == '.' || (name[0] == '.' && name[1] == '.')))
             { // Skip "." and ".." directories
                 DIR *subDir = opendir(fullPath);
-                cout << " " << typeStr << endl;
                 doDir(subDir, fullPath);
                 continue; // wo Continue here, it prints an extra blank line, need to break the iteration here
             }
             else
             {
-                cout << " " << typeStr;
+                for (int i = 0; i < strlen(fullPath); i++)
+                {
+                    cout << fullPath[i];
+                }
+                cout << " (d)" << endl;
+                delete tempStr;
+                continue;
             }
         }
         else if (S_ISREG(m))
         {
+            for (int i = 0; i < strlen(fullPath); i++)
+            {
+                cout << fullPath[i];
+            }
             int size = statbuf.st_size;
             typeStr = "(f, " + to_string(size) + ")";
             cout << " " << typeStr;
@@ -90,6 +98,10 @@ void doDir(DIR *dir, char *path)
         reg or dir, you're lnk.
         */
         {
+            for (int i = 0; i < strlen(fullPath); i++)
+            {
+                cout << fullPath[i];
+            }
             typeStr = "(l, -> ";
             cout << " " << typeStr;
             // lstat(fullPath, &statbuf);
@@ -107,7 +119,7 @@ void doDir(DIR *dir, char *path)
         cout << endl;
         delete tempStr;
     }
-
+    cout << path << " (d)" << endl;
     closedir(dir);
 }
 
@@ -115,7 +127,7 @@ int main(int argc, char *argv[])
 {
     // cout << "argv[1] == " << argv[1]; // DEBUG
     // DIR *d = opendir(argv[1]);
-    char start[] = "/home/rappleto/pub/Classes/CS426/Assignments/dircount-assignment/test3";
+    char start[] = "/home/rappleto/pub/Classes/CS426/Assignments/dircount-assignment";
     DIR *d = opendir(start);
     if (d == nullptr)
     {
@@ -123,4 +135,5 @@ int main(int argc, char *argv[])
         exit(1);
     }
     doDir(d, start);
+    cout << "the total size of the directories is: " << totalSize << " bytes" << endl;
 }
