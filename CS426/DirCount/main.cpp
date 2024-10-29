@@ -19,15 +19,7 @@
 unsigned long totalSize = 0;
 unsigned long visited[1000];
 using namespace std;
-bool searchAr(auto ar[], auto ino)
-{
-    for (int i = 0; i < sizeof(ar); i++)
-    {
-        if (ar[i] == ino)
-            return true;
-    }
-    return false;
-}
+
 void doDir(DIR *dir, char *path)
 {
 
@@ -49,8 +41,7 @@ void doDir(DIR *dir, char *path)
         mode_t m = statbuf.st_mode;
         totalSize += statbuf.st_size;
         unsigned long ino = statbuf.st_ino;
-        // if (!searchAr(visited, ino)) removed the visited condition for the sake of time. If I have time to revisit, I'll try to reimplement
-        // {
+
         for (int i = 0; i < sizeof(visited); i++)
         {
             if (visited[i] == 0)
@@ -115,7 +106,7 @@ void doDir(DIR *dir, char *path)
             }
             cout << ")";
         }
-        // }
+
         cout << endl;
         delete tempStr;
     }
@@ -126,14 +117,13 @@ void doDir(DIR *dir, char *path)
 int main(int argc, char *argv[])
 {
     // cout << "argv[1] == " << argv[1]; // DEBUG
-    // DIR *d = opendir(argv[1]);
-    char start[] = "/home/rappleto/pub/Classes/CS426/Assignments/dircount-assignment";
-    DIR *d = opendir(start);
+    DIR *d = opendir(argv[1]);
+
     if (d == nullptr)
     {
         perror("opendir");
         exit(1);
     }
-    doDir(d, start);
+    doDir(d, argv[1]);
     cout << "the total size of the directories is: " << totalSize << " bytes" << endl;
 }
