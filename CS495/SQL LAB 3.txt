@@ -1,0 +1,44 @@
+CREATE TABLE Authors(
+	AuthorID INTEGER PRIMARY KEY,
+	Name TEXT NOT NULL
+);
+
+CREATE TABLE Books(
+	BookID INTEGER PRIMARY KEY,
+	Title TEXT NOT NULL
+);
+
+CREATE TABLE Authors_Books(
+	AuthorID INTEGER NOT NULL,
+	BookID INTEGER NOT NULL,
+	PRIMARY KEY (AuthorID, BookID),
+	FOREIGN KEY(AuthorID) REFERENCES Authors(AuthorID),
+	FOREIGN KEY(BookID) REFERENCES Books(BookID)
+);
+
+INSERT INTO Authors VALUES(NULL, 'Tolkien');
+INSERT INTO Authors VALUES(NULL, 'Gamma');
+INSERT INTO Authors VALUES(NULL, 'Helm');
+INSERT INTO Authors VALUES(NULL, 'Johnson');
+INSERT INTO Authors VALUES(NULL, 'Vlissides');
+
+INSERT INTO Books VALUES(NULL, 'The Lord Of the Rings');
+INSERT INTO Books VALUES(NULL, 'The Hobbit');
+INSERT INTO Books VALUES(NULL, 'Design Patterns');
+INSERT INTO Books VALUES(NULL, 'Refactoring');
+INSERT INTO Books VALUES(NULL, 'Fundamentals of Argumentation Theory');
+INSERT INTO Books VALUES(NULL, 'Pattern Hatching');
+
+INSERT INTO Authors_Books VALUES ((SELECT AuthorID FROM Authors WHERE Name = 'Tolkien'), (SELECT BookID from Books WHERE Title = 'The Lord Of the Rings'));
+INSERT INTO Authors_Books VALUES ((SELECT AuthorID FROM Authors WHERE Name = 'Tolkien'), (SELECT BookID from Books WHERE Title = 'The Hobbit')); 
+INSERT INTO Authors_Books VALUES ((SELECT AuthorID FROM Authors WHERE Name = 'Gamma'), (SELECT BookID from Books WHERE Title = 'Design Patterns'));
+INSERT INTO Authors_Books VALUES ((SELECT AuthorID FROM Authors WHERE Name = 'Helm'), (SELECT BookID from Books WHERE Title = 'Design Patterns'));
+INSERT INTO Authors_Books VALUES ((SELECT AuthorID FROM Authors WHERE Name = 'Johnson'), (SELECT BookID from Books WHERE Title = 'Design Patterns'));
+INSERT INTO Authors_Books VALUES ((SELECT AuthorID FROM Authors WHERE Name = 'Vlissides'), (SELECT BookID from Books WHERE Title = 'Design Patterns'));
+INSERT INTO Authors_Books VALUES ((SELECT AuthorID FROM Authors WHERE Name = 'Gamma'), (SELECT BookID from Books WHERE Title = 'Refactoring')); 
+INSERT INTO Authors_Books VALUES ((SELECT AuthorID FROM Authors WHERE Name = 'Johnson'), (SELECT BookID from Books WHERE Title = 'Fundamentals of Argumentation Theory')); 
+INSERT INTO Authors_Books VALUES ((SELECT AuthorID FROM Authors WHERE Name = 'Vlissides'), (SELECT BookID from Books WHERE Title = 'Pattern Hatching')); 
+
+SELECT Name, Books.Title FROM Authors JOIN Authors_Books ON Authors.AuthorID = Authors_Books.AuthorID JOIN Books ON Books.BookID = Authors_Books.BookID;
+
+SELECT Name, Books.Title FROM Authors JOIN Authors_Books ON Authors.AuthorID = Authors_Books.AuthorID JOIN Books ON Books.BookID = Authors_Books.BookID WHERE Authors.AuthorID = 1;
