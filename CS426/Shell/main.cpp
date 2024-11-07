@@ -122,11 +122,11 @@ void startCD(char **args)
 }
 void readCommand(char **args)
 {
-    if (args[0][0] == 'c' && args[0][1] == 'd')
+    if (0 == strcmp(args[0], "cd"))
     {
         startCD(args);
     }
-    else if (args[0][0] == 'e' && args[0][1] == 'x' && args[0][2] == 'i' && args[0][3] == 't')
+    else if (0 == strcmp(args[0], "exit"))
     {
         exit(0);
     }
