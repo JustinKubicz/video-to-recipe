@@ -2,6 +2,10 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <stdio.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+//sudo apt-get install libreadline-dev
 using namespace std;
 bool isConcatinated(char **args)
 {
@@ -22,30 +26,26 @@ bool isConcatinated(char **args)
     }
     return false;
 }
-void Exec(int aPID, char **args)
+int Exec(int aPID, char **args)
 {
 
     if (aPID == 0)
     {
-        /*
-        for each thing in path
-                execvp(argv[0], argv);
-            exit
-        */
         for (int i = 0; args[i] != nullptr; i++)
         {
 
             execvp(args[0], args);
         }
-        exit(0);
+        exit(1); // if exec fails, exit with code 1
     }
-    else if (aPID > 0)
+    else
     {
         int status;
         if (-1 == waitpid(aPID, &status, 0))
         {
             perror("waitpid error");
         }
+        return status;
     }
 }
 
@@ -77,36 +77,40 @@ char **parseInput(char *in)
 
 char **startNewOp()
 {
-    char *input = new char[10000];
-    cin.getline(input, 10000);
+    char *input = readline("$");
     char **args = parseInput(input); // as of 11/1, args is correctly an array of char*
     return args;
 }
-void changeDir(char *path)
+int changeDir(char *path)
 {
     int newDir = chdir(path);
     if (newDir == -1)
+    {
         perror("chdir");
+        return newDir;
+    }
+    else
+        return 0;
 }
-void Fork(char **args)
+int Fork(char **args)
 {
     int pid = fork();
     if (pid == -1)
         perror("bad fork");
-    Exec(pid, args);
+    return Exec(pid, args);
 }
 void getAndPrintWorkingDir()
 {
     cout << "Donatello:~";
     char *currentDir = get_current_dir_name(); // https://man7.org/linux/man-pages/man3/getcwd.3.html
-    cout << currentDir << "$ ";
+    cout << currentDir;
 }
-void startCD(char **args)
+int startCD(char **args)
 {
     char *command = args[0];
-    if (!command[2])
+    if (strlen(command) == 2)
     {
-        changeDir(args[1]);
+        return changeDir(args[1]);
     }
     else
     {
@@ -117,14 +121,14 @@ void startCD(char **args)
             noSpaceCharAfterCDCommand[incrementor] = command[i];
             incrementor++;
         }
-        changeDir(noSpaceCharAfterCDCommand);
+        return changeDir(noSpaceCharAfterCDCommand);
     }
 }
-void readCommand(char **args)
+int readCommand(char **args)
 {
     if (args[0][0] == 'c' && args[0][1] == 'd')
     {
-        startCD(args);
+        return startCD(args);
     }
     else if (args[0][0] == 'e' && args[0][1] == 'x' && args[0][2] == 'i' && args[0][3] == 't')
     {
@@ -132,7 +136,7 @@ void readCommand(char **args)
     }
     else
     {
-        Fork(args);
+        return Fork(args);
     }
 }
 void callReadCommandsForConcat(char **args)
@@ -146,13 +150,19 @@ void callReadCommandsForConcat(char **args)
             break;
     }
     char **working = new char *[size];
-    for(int i = 0; i < size; i++){
+    for (int i = 0; i < size; i++)
+    {
         working[0] = args[i];
         working[1] = nullptr;
-        if(i+1 == size || args[i+1][0] == '&' && args[i+1][1] == '&' || args[i+1] == nullptr){
-            readCommand(working);
+        if (i + 1 == size || args[i + 1][0] == '&' && args[i + 1][1] == '&' || args[i + 1] == nullptr)
+        {
+            int stat = readCommand(working);
+            if (stat != 0)
+            {
+                cout << working[0] << " is not a valid command." << endl;
+                break;
+            }
         }
-        
     }
 }
 int main()
@@ -169,7 +179,10 @@ int main()
         }
         else
         {
-            readCommand(args);
+            if (0 != readCommand(args))
+            {
+                cout << args[0] << " is not a recognized command." << endl;
+            }
         }
     }
 }
