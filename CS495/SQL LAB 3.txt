@@ -39,6 +39,4 @@ INSERT INTO Authors_Books VALUES ((SELECT AuthorID FROM Authors WHERE Name = 'Ga
 INSERT INTO Authors_Books VALUES ((SELECT AuthorID FROM Authors WHERE Name = 'Johnson'), (SELECT BookID from Books WHERE Title = 'Fundamentals of Argumentation Theory')); 
 INSERT INTO Authors_Books VALUES ((SELECT AuthorID FROM Authors WHERE Name = 'Vlissides'), (SELECT BookID from Books WHERE Title = 'Pattern Hatching')); 
 
-SELECT Name, Books.Title FROM Authors JOIN Authors_Books ON Authors.AuthorID = Authors_Books.AuthorID JOIN Books ON Books.BookID = Authors_Books.BookID;
-
-SELECT Name, Books.Title FROM Authors JOIN Authors_Books ON Authors.AuthorID = Authors_Books.AuthorID JOIN Books ON Books.BookID = Authors_Books.BookID WHERE Authors.AuthorID = 1;
+SELECT
