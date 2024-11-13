@@ -1,0 +1,49 @@
+PRAGMA foreign_keys = ON; 
+
+CREATE TABLE Regions(
+	RegionID INTEGER PRIMARY KEY,
+	Name TEXT NOT NULL
+);
+CREATE TABLE Species(
+	SpeciesID INTEGER PRIMARY KEY,
+	Name TEXT NOT NULL
+);
+CREATE TABLE Regions_Species(
+	RegionID INTEGER NOT NULL,
+	SpeciesID INTEGER NOT NULL,
+	PRIMARY KEY (RegionID, SpeciesID),
+	FOREIGN KEY(RegionID) REFERENCES Regions(RegionID),
+	FOREIGN KEY(SpeciesID) REFERENCES Species(SpeciesID)
+);
+CREATE TABLE Sightings(
+	SightingID INTEGER PRIMARY KEY,
+	SpeciesID INTEGER NOT NULL,
+	SpotterID INTEGER NOT NULL,
+	Latitude FLOAT NOT NULL,
+	Longitude FLOAT NOT NULL,
+	Date VARCHAR(10) NOT NULL,
+	FOREIGN KEY(SpeciesID) REFERENCES Species(SpeciesID),
+	FOREIGN KEY(SpotterID) REFERENCES Spotters(SpotterID)
+	
+);
+!!!!!!CREATE TABLE Species_Sightings(
+	SpeciesID INTEGER NOT NULL,
+	SightingID INTEGER NOT NULL,
+	PRIMARY KEY(SpeciesID, SightingID),
+	FOREIGN KEY(SpeciesID) REFERENCES Species(SpeciesID),
+	FOREIGN KEY(SightingID) REFERENCES Sightings(SightingID)
+);
+CREATE TABLE Spotters(
+	SpotterID INTEGER PRIMARY KEY,
+	Name TEXt NOT NULL,
+	
+);
+!!!!!!!CREATE TABLE Spotters_Sightings(
+	SpeciesID INTEGER NOT NULL,
+	SpotterID INTEGER NOT NULL,
+	PRIMARY KEY(SpeciesID, SpotterID),
+	FOREIGN KEY(SpeciesID) REFERENCES Species(SpeciesID),
+	FOREIGN KEY(SpotterID) REFERENCES Spotters(SpotterID)
+);
+
+CREATE INDEX Idx_Spotter_Sighting ON Sightings(SpotterID);
