@@ -35,7 +35,7 @@ CREATE TABLE Sightings(
 );
 CREATE TABLE Spotters(
 	SpotterID INTEGER PRIMARY KEY,
-	Name TEXt NOT NULL,
+	Name TEXt NOT NULL
 	
 );
 !!!!!!!CREATE TABLE Spotters_Sightings(
@@ -47,3 +47,34 @@ CREATE TABLE Spotters(
 );
 
 CREATE INDEX Idx_Spotter_Sighting ON Sightings(SpotterID);
+
+INSERT INTO Species(Name) VALUES('House Finch');
+INSERT INTO Species(Name) VALUES('Mallard');
+INSERT INTO Species(Name) VALUES('Pine grosbeak');
+INSERT INTO Species(Name) VALUES('Common starling');
+INSERT INTO Species(Name) VALUES('Cassins finch');
+INSERT INTO Species(Name) VALUES('California Condor');
+
+INSERT INTO Regions(Name) VALUES('Midwest');
+INSERT INTO Regions(Name) VALUES('Northeast');
+INSERT INTO Regions(Name) VALUES('South');
+INSERT INTO Regions(Name) VALUES('West');
+
+INSERT INTO Spotters(Name) VALUES('JD');
+INSERT INTO Spotters(Name) VALUES('Santa Clause');
+INSERT INTO Spotters(Name) VALUES('Barack');
+
+
+INSERT INTO Sightings VALUES(NULL, (SELECT SpeciesID FROM Species WHERE Name = 'House Finch'), 
+(SELECT SpotterID FROM Spotters WHERE Name = 'JD'), 42.74, 92.305, 2024-11-13);
+
+INSERT INTO Sightings VALUES(NULL, (SELECT SpeciesID FROM Species WHERE Name = 'Cassins finch'), 
+(SELECT SpotterID FROM Spotters WHERE Name = 'Santa Clause'), 42.74, 92.305, 2024-11-13);
+
+INSERT INTO Sightings VALUES(NULL, (SELECT SpeciesID FROM Species WHERE Name = 'Common starling'), 
+(SELECT SpotterID FROM Spotters WHERE Name = 'Barack'), 42.74, 92.305, 2024-11-13);
+
+INSERT INTO Sightings VALUES(NULL, (SELECT SpeciesID FROM Species WHERE Name = 'Pine grosbeak'), 
+(SELECT SpotterID FROM Spotters WHERE Name = 'JD'), 42.74, 92.305, 2024-11-13);
+
+SELECT Latitude, Longitude, Date FROM Sightings  WHERE SpotterID = (SELECT SpotterID FROM Spotters WHERE Name = 'JD') JOIN Species ON Sightings.SpeciesID = Species.SpeciesID;
