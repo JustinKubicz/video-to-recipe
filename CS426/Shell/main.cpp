@@ -79,6 +79,7 @@ char **startNewOp()
 {
     char *input = readline("$");
     char **args = parseInput(input); // as of 11/1, args is correctly an array of char*
+    free(input);
     return args;
 }
 int changeDir(char *path)
@@ -107,6 +108,7 @@ void getAndPrintWorkingDir()
 }
 int startCD(char **args)
 {
+    //works with "cd .." and "cd.."
     char *command = args[0];
     if (strlen(command) == 2)
     {
@@ -114,19 +116,21 @@ int startCD(char **args)
     }
     else
     {
-        char *noSpaceCharAfterCDCommand = new char[strlen(command) - 2];
+        int size = strlen(command) - 2;
+        char *newDir = new char[size + 1];
         int incrementor = 0;
         for (int i = 2; i < strlen(command); i++)
         {
-            noSpaceCharAfterCDCommand[incrementor] = command[i];
+            newDir[incrementor] = command[i];
             incrementor++;
         }
-        return changeDir(noSpaceCharAfterCDCommand);
+        newDir[incrementor] = 0;
+        return changeDir(newDir);
     }
 }
 int readCommand(char **args)
 {
-    if (0 == strcmp(args[0], "cd"))
+    if (0 == strcmp(args[0], "cd") || (args[0][0] == 'c' && args[0][1] == 'd'))
     {
         return startCD(args);
     }
