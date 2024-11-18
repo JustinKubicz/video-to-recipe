@@ -17,8 +17,8 @@ CREATE TABLE Regions_Species(
 );
 CREATE TABLE Sightings(
 	SightingID INTEGER PRIMARY KEY,
-	SpeciesID INTEGER NOT NULL,
-	SpotterID INTEGER NOT NULL,
+	SpeciesID INTEGER,
+	SpotterID INTEGER,
 	Latitude FLOAT NOT NULL,
 	Longitude FLOAT NOT NULL,
 	Date VARCHAR(10) NOT NULL,
@@ -26,24 +26,97 @@ CREATE TABLE Sightings(
 	FOREIGN KEY(SpotterID) REFERENCES Spotters(SpotterID)
 	
 );
-!!!!!!CREATE TABLE Species_Sightings(
-	SpeciesID INTEGER NOT NULL,
-	SightingID INTEGER NOT NULL,
-	PRIMARY KEY(SpeciesID, SightingID),
-	FOREIGN KEY(SpeciesID) REFERENCES Species(SpeciesID),
-	FOREIGN KEY(SightingID) REFERENCES Sightings(SightingID)
-);
+
 CREATE TABLE Spotters(
 	SpotterID INTEGER PRIMARY KEY,
-	Name TEXt NOT NULL,
+	Name TEXt NOT NULL
 	
 );
-!!!!!!!CREATE TABLE Spotters_Sightings(
-	SpeciesID INTEGER NOT NULL,
-	SpotterID INTEGER NOT NULL,
-	PRIMARY KEY(SpeciesID, SpotterID),
-	FOREIGN KEY(SpeciesID) REFERENCES Species(SpeciesID),
-	FOREIGN KEY(SpotterID) REFERENCES Spotters(SpotterID)
-);
+
 
 CREATE INDEX Idx_Spotter_Sighting ON Sightings(SpotterID);
+
+INSERT INTO Species(Name) VALUES('House Finch');
+INSERT INTO Species(Name) VALUES('Mallard');
+INSERT INTO Species(Name) VALUES('Pine grosbeak');
+INSERT INTO Species(Name) VALUES('Common starling');
+INSERT INTO Species(Name) VALUES('Cassins finch');
+INSERT INTO Species(Name) VALUES('California Condor');
+
+INSERT INTO Regions(Name) VALUES('Midwest');
+INSERT INTO Regions(Name) VALUES('Northeast');
+INSERT INTO Regions(Name) VALUES('South');
+INSERT INTO Regions(Name) VALUES('West');
+
+INSERT INTO Spotters(Name) VALUES('JD');
+INSERT INTO Spotters(Name) VALUES('Santa Clause');
+INSERT INTO Spotters(Name) VALUES('Barack');
+
+INSERT INTO Regions_Species(RegionId, SpeciesID) VALUES (
+	(SELECT RegionID FROM Regions WHERE Name = 'West'),
+	(SELECT SpeciesID FROM Species WHERE Name = 'House Finch')
+);
+INSERT INTO Regions_Species(RegionId, SpeciesID) VALUES (
+	(SELECT RegionID FROM Regions WHERE Name = 'West'),
+	(SELECT SpeciesID FROM Species WHERE Name = 'Mallard')
+);
+INSERT INTO Regions_Species(RegionId, SpeciesID) VALUES (
+	(SELECT RegionID FROM Regions WHERE Name = 'Midwest'),
+	(SELECT SpeciesID FROM Species WHERE Name = 'Mallard')
+);
+INSERT INTO Regions_Species(RegionId, SpeciesID) VALUES (
+	(SELECT RegionID FROM Regions WHERE Name = 'Northeast'),
+	(SELECT SpeciesID FROM Species WHERE Name = 'Mallard')
+);
+INSERT INTO Regions_Species(RegionId, SpeciesID) VALUES (
+	(SELECT RegionID FROM Regions WHERE Name = 'South'),
+	(SELECT SpeciesID FROM Species WHERE Name = 'Mallard')
+);
+INSERT INTO Regions_Species(RegionId, SpeciesID) VALUES (
+	(SELECT RegionID FROM Regions WHERE Name = 'West'),
+	(SELECT SpeciesID FROM Species WHERE Name = 'Pine grosbeak')
+);
+INSERT INTO Regions_Species(RegionId, SpeciesID) VALUES (
+	(SELECT RegionID FROM Regions WHERE Name = 'Northeast'),
+	(SELECT SpeciesID FROM Species WHERE Name = 'Pine grosbeak')
+);
+INSERT INTO Regions_Species(RegionId, SpeciesID) VALUES (
+	(SELECT RegionID FROM Regions WHERE Name = 'West'),
+	(SELECT SpeciesID FROM Species WHERE Name = 'Cassins finch')
+);
+INSERT INTO Regions_Species(RegionId, SpeciesID) VALUES (
+	(SELECT RegionID FROM Regions WHERE Name = 'South'),
+	(SELECT SpeciesID FROM Species WHERE Name = 'California Condor')
+);
+
+INSERT INTO Sightings VALUES(NULL, (SELECT SpeciesID FROM Species WHERE Name = 'House Finch'), 
+(SELECT SpotterID FROM Spotters WHERE Name = 'JD'), 42.74, 92.305, 2024-11-13);
+
+INSERT INTO Sightings VALUES(NULL, (SELECT SpeciesID FROM Species WHERE Name = 'Cassins finch'), 
+(SELECT SpotterID FROM Spotters WHERE Name = 'Santa Clause'), 42.74, 92.305, 2024-11-13);
+
+INSERT INTO Sightings VALUES(NULL, (SELECT SpeciesID FROM Species WHERE Name = 'Common starling'), 
+(SELECT SpotterID FROM Spotters WHERE Name = 'Barack'), 42.74, 92.305, 2024-11-13);
+
+INSERT INTO Sightings VALUES(NULL, (SELECT SpeciesID FROM Species WHERE Name = 'Pine grosbeak'), 
+(SELECT SpotterID FROM Spotters WHERE Name = 'JD'), 42.74, 92.305, 2024-11-13);
+
+SELECT 
+	Latitude, Longitude, Date, Species.Name 
+FROM 
+	Sightings JOIN Species ON Sightings.SpeciesID = Species.SpeciesID 
+WHERE 
+	SpotterID = (SELECT SpotterID FROM Spotters WHERE Name = 'JD');
+
+SELECT
+	Regions_Species.SpeciesID, Regions.Name
+FROM
+	Regions_Species JOIN Regions ON Regions_Species.SpeciesID = (SELECT SpeciesID FROM Species WHERE SpeciesID = 1);
+
+
+UPDATE Species SET Name = 'Gymnogyps californianus' WHERE Name = 'California Condor';
+
+BEGIN;
+	UPDATE OR ROLLBACK Sightings SET SpotterID = NULL WHERE SpotterID = 1;
+	DELETE FROM Spotters WHERE SpotterID = 1;
+COMMIT;
