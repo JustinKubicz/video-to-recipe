@@ -20,6 +20,7 @@ output from shell history is correctly being appended
 
 */
 int historyCount = 0;
+bool backgroundProcessFlag = false; 
 bool isConcatinated(char **args)
 {
     int size = 0;
@@ -51,17 +52,19 @@ int Exec(int aPID, char **args)
         // }
         exit(1); // if exec fails, exit with code 1
     }
-    else
+    else if (!backgroundProcessFlag)
     {
         int status;
         if (-1 == waitpid(aPID, &status, 0))
         {
             perror("waitpid error");
         }
+        backgroundProcessFlag = !backgroundProcessFlag;
         return status;
+    }else{
+        return 0;
     }
 }
-
 char **parseInput(char *in)
 {
     wordexp_t result;
@@ -78,6 +81,11 @@ char **parseInput(char *in)
         if (in[i + 1] == ' ' || i + 1 == s)
         {
             temp[tempIterator] = 0;
+            if (0 == strcmp(temp, "&"))
+            {
+                backgroundProcessFlag = !backgroundProcessFlag;
+                break;
+            }
             int wordy = 0;
             if (count == 0)
                 wordy = wordexp(temp, &result, 0);
@@ -105,7 +113,7 @@ char **parseInput(char *in)
 char **readLineAndAddHistory()
 {
     char **args;
-    char *input = readline("$ ");
+    char *input = readline(getenv("PS1"));
     fflush(stdout);
     if (strcmp(input, "") == 0)
     {
@@ -140,7 +148,7 @@ int Fork(char **args)
         perror("bad fork");
     return Exec(pid, args);
 }
-void getAndPrintWorkingDir()
+void getWorkingDirSetToPS1()
 {
     cout << "Donatello:";
     char *currentDir = get_current_dir_name(); // https://man7.org/linux/man-pages/man3/getcwd.3.html
@@ -152,7 +160,12 @@ void getAndPrintWorkingDir()
         curDirIterator++;
     }
     curDir[curDirIterator] = 0;
-    cout << "~" << curDir << " ";
+    cout << "~" << curDir << "$ ";
+    char *prompt = new char[strlen(curDir) + 4];
+    prompt[0] = '~';
+    prompt[strlen(curDir) + 1] = '$';
+    prompt[strlen(curDir) + 1] = ' ';
+    
     free(currentDir);
 }
 int startCD(char **args)
@@ -233,7 +246,7 @@ int main()
     while (true)
     {
 
-        getAndPrintWorkingDir();
+        getWorkingDirSetToPS1();
         char **args = readLineAndAddHistory(); // as of 11/1, args is correctly an array of char*
         fflush(stdout);                        // added an fflush to here and to readLineAndAddHistory() b/c I was getting some weird printing going on and google said this could help
         if (args == nullptr)
