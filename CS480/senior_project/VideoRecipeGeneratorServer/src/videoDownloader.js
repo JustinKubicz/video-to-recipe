@@ -1,5 +1,6 @@
 const dwn = require("ytdlp-nodejs"); //https://github.com/iqbal-rashed/ytdlp-nodejs
 const ProgressBar = require("progress");
+const fs = require("fs");
 
 function decipherYTVideoID(aUrl) {
   if (aUrl) {
@@ -38,7 +39,11 @@ exports.downloadVideoYT = async function downloadVideo(aUrl) {
       })
       .on("finished", () => {
         console.log("\nFINISHED DOWNLOADING: ./test/" + id + ".webm");
-        resolve("./test/" + id + ".webm");
+        if (fs.existsSync("./test/" + id + ".webm")) {
+          resolve("./test/" + id + ".webm");
+        } else {
+          reject("failed to find video file after download");
+        }
       })
       .on("error", (e) => {
         console.error(e);

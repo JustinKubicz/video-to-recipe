@@ -14,7 +14,7 @@ app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
 
-async function readUrl(aUrl) {
+async function start(aUrl) {
   if (aUrl.includes("shorts")) {
     //if yt shorts, convert to watch url and proceed like normal yt
     let modifiedUrl = aUrl.replace("shorts/", "watch?v=");
@@ -33,7 +33,7 @@ app.post("/api/generate", async (req, res) => {
   try {
     const { url } = req.body;
     console.log("POST RECEIVED: ", url);
-    const videoPath = await readUrl(url);
+    const videoPath = await start(url);
     const transcriptPath = transcriptGrabber.generateTranscript(videoPath);
     res.status(200).json({ videoPath });
     console.log("VIDEO DOWNLOADED: ", videoPath);

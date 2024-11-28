@@ -12,7 +12,6 @@ exports.generateTranscript = async function generateTranscript(aFilePath) {
   let pattern = /(.*\/.*\/)/g;
   let match = pattern.exec(aFilePath);
   let result = "";
-  console.log(process.env.PATH);
 
   if (match) {
     let matchEndIndex = match[0].length;
