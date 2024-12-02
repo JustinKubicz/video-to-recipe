@@ -1,12 +1,35 @@
 const { YoutubeTranscript } = require("youtube-transcript"); //https://www.npmjs.com/package/youtube-transcript YOUTUBE TRANSCRIPT FETCHER
-const Whisper = require("nodejs-whisper"); //https://www.npmjs.com/package/nodejs-whisper TRANSCRIPT GENERATOR
-//nodejs-whisper requires: https://cygwin.com/install.html specifically the make utility
+const { OpenAI } = require("openai");
+const ffmpeg = require("fluent-ffmpeg");
 
+const fs = require("fs");
 exports.fetchTrYT = async function fetchTr(aUrl) {
   const tr = await YoutubeTranscript.fetchTranscript(aUrl).then(console.log);
   console.log(tr);
   return tr;
 };
+
+const openAI = new OpenAI({
+  apiKey:
+    "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",
+});
+
+async function convertToMp3(aFilePath) {
+  return new Promise((resolve, reject) => {
+    let result = aFilePath + ".mp3";
+    ffmpeg(aFilePath)
+      .toFormat("mp3") // You can change the format as needed
+      .on("end", () => {
+        console.log("Conversion finished");
+        resolve(result);
+      })
+      .on("error", (err) => {
+        console.error("Error during conversion:", err);
+        reject(err);
+      })
+      .save(result);
+  });
+}
 
 exports.generateTranscript = async function generateTranscript(aFilePath) {
   let pattern = /(.*\/.*\/)/g;
@@ -20,22 +43,30 @@ exports.generateTranscript = async function generateTranscript(aFilePath) {
     console.log("Match: ", match[0]);
     console.log("FileName before .txt: ", result);
   }
-  await Whisper.nodewhisper(aFilePath, {
-    modelName: "tiny.en",
-    output: result + ".txt",
-    verbose: true,
-    removeWavFileAfterTranscription: false,
-    withCuda: false,
-    autoDownloadModelName: false,
-    whisperOptions: {
-      outputInText: true, //output in txt
-      outputInVtt: false,
-      outputInSrt: false,
-      outputInCsv: false,
-      translateToEnglish: false,
-      timestamps_length: 20,
-      wordTimestamps: false,
-      splitOnWord: true,
-    },
-  });
+  if (!fs.existsSync("transcript-" + result + ".txt")) {
+    console.log(aFilePath);
+    await convertToMp3(aFilePath).then(async (mp3) => {
+      console.log("starting transcription: ", mp3);
+      if (fs.existsSync(mp3)) {
+        const transcription = await openAI.audio.transcriptions.create({
+          file: fs.createReadStream(mp3),
+          model: "whisper-1",
+          response_format: "verbose_json",
+          timestamp_granularities: ["word"],
+        });
+        let writeStream = fs.createWriteStream("transcript-" + result + ".txt");
+        writeStream.write(transcription.text, () => {
+          return transcription.text;
+        });
+      } else {
+        console.log("Unable to locate mp3 file");
+      }
+    });
+  } else {
+    console.log("transcript-" + result + ".txt exists already retrieving: ");
+    let retrieval = "";
+    let file = open("transcript-" + result + ".txt", "r");
+    file.read(retrieval, 0, file.length, null);
+    return retrieval;
+  }
 };

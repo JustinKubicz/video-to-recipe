@@ -2,9 +2,13 @@ import express, { json, urlencoded } from "express";
 import cors from "cors";
 import videoDownloader from "./src/videoDownloader.js";
 import transcriptGrabber from "./src/transcriptGrabber.js";
+import execFile from "child_process";
 
 const app = express();
-
+/*
+TODO:
+  . If files exist, don't remake them, especially the transcript.
+*/
 app.use(cors());
 app.use(json());
 app.use(urlencoded({ extended: true }));
@@ -13,7 +17,20 @@ const port = 5000;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
-
+async function parseIngredientsWithPython(transcript) {
+  execFile(
+    "python",
+    ["src/ingredientParserNlp.py", transcript, id],
+    (error, stdout, stderr) => {
+      if (error) {
+        console.error("Error calling Python script:", error);
+      }
+      if (stderr) {
+        console.error("Standard error from Python script:", stderr);
+      }
+    }
+  );
+}
 async function start(aUrl) {
   if (aUrl.includes("shorts")) {
     //if yt shorts, convert to watch url and proceed like normal yt
@@ -34,7 +51,9 @@ app.post("/api/generate", async (req, res) => {
     const { url } = req.body;
     console.log("POST RECEIVED: ", url);
     const videoPath = await start(url);
-    const transcriptPath = transcriptGrabber.generateTranscript(videoPath);
+    const transcript = await transcriptGrabber.generateTranscript(videoPath);
+    console.log("transcript: ", transcript);
+    await parseIngredientsWithPython(transcript);
     res.status(200).json({ videoPath });
     console.log("VIDEO DOWNLOADED: ", videoPath);
   } catch (error) {
