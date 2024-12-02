@@ -2,7 +2,7 @@ import express, { json, urlencoded } from "express";
 import cors from "cors";
 import videoDownloader from "./src/videoDownloader.js";
 import transcriptGrabber from "./src/transcriptGrabber.js";
-import execFile from "child_process";
+import { execFile } from "child_process";
 
 const app = express();
 /*
@@ -17,7 +17,7 @@ const port = 5000;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
-async function parseIngredientsWithPython(transcript) {
+async function parseIngredientsWithPython(transcript, id) {
   execFile(
     "python",
     ["src/ingredientParserNlp.py", transcript, id],
@@ -52,8 +52,7 @@ app.post("/api/generate", async (req, res) => {
     console.log("POST RECEIVED: ", url);
     const videoPath = await start(url);
     const transcript = await transcriptGrabber.generateTranscript(videoPath);
-    console.log("transcript: ", transcript);
-    await parseIngredientsWithPython(transcript);
+    await parseIngredientsWithPython(transcript, decipherYTVideoID(url));
     res.status(200).json({ videoPath });
     console.log("VIDEO DOWNLOADED: ", videoPath);
   } catch (error) {
@@ -61,3 +60,21 @@ app.post("/api/generate", async (req, res) => {
     res.status(500).json({ error: "Error processing video" });
   }
 });
+
+function decipherYTVideoID(aUrl) {
+  if (aUrl.includes("shorts")) {
+    //if yt shorts, convert to watch url and proceed like normal yt
+    let modifiedUrl = aUrl.replace("shorts/", "watch?v=");
+    aUrl = modifiedUrl;
+  }
+  let pattern = /.*(\w{5}\?\w\=)/g; //thanks Sarkela!
+  let match = pattern.exec(aUrl);
+  if (match) {
+    let matchEndIndex = match[0].length;
+    let result = aUrl.slice(matchEndIndex).trim();
+    //   console.log("Original String: ", aUrl);
+    //   console.log("Match: ", match[0]);
+    //   console.log("VideoId: ", result);
+    return result;
+  }
+}

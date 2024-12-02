@@ -35,38 +35,52 @@ exports.generateTranscript = async function generateTranscript(aFilePath) {
   let pattern = /(.*\/.*\/)/g;
   let match = pattern.exec(aFilePath);
   let result = "";
-
-  if (match) {
-    let matchEndIndex = match[0].length;
-    result = aFilePath.slice(matchEndIndex).trim();
-    console.log("Original String: ", aFilePath);
-    console.log("Match: ", match[0]);
-    console.log("FileName before .txt: ", result);
-  }
-  if (!fs.existsSync("transcript-" + result + ".txt")) {
-    console.log(aFilePath);
-    await convertToMp3(aFilePath).then(async (mp3) => {
-      console.log("starting transcription: ", mp3);
-      if (fs.existsSync(mp3)) {
-        const transcription = await openAI.audio.transcriptions.create({
-          file: fs.createReadStream(mp3),
-          model: "whisper-1",
-          response_format: "verbose_json",
-          timestamp_granularities: ["word"],
-        });
-        let writeStream = fs.createWriteStream("transcript-" + result + ".txt");
-        writeStream.write(transcription.text, () => {
-          return transcription.text;
-        });
-      } else {
-        console.log("Unable to locate mp3 file");
-      }
-    });
-  } else {
-    console.log("transcript-" + result + ".txt exists already retrieving: ");
-    let retrieval = "";
-    let file = open("transcript-" + result + ".txt", "r");
-    file.read(retrieval, 0, file.length, null);
-    return retrieval;
-  }
+  return new Promise((resolve, reject) => {
+    if (match) {
+      let matchEndIndex = match[0].length;
+      result = aFilePath.slice(matchEndIndex).trim();
+      console.log("Original String: ", aFilePath);
+      console.log("Match: ", match[0]);
+      console.log("FileName before .txt: ", result);
+    }
+    if (!fs.existsSync("transcript-" + result + ".txt")) {
+      console.log(aFilePath);
+      convertToMp3(aFilePath).then(async (mp3) => {
+        console.log("starting transcription: ", mp3);
+        if (fs.existsSync(mp3)) {
+          try {
+            const transcription = await openAI.audio.transcriptions.create({
+              file: fs.createReadStream(mp3),
+              model: "whisper-1",
+              response_format: "verbose_json",
+              timestamp_granularities: ["word"],
+            });
+            let writeStream = fs.createWriteStream(
+              "transcript-" + result + ".txt"
+            );
+            writeStream.write(transcription.text, () => {
+              resolve(transcription.text);
+            });
+          } catch (error) {
+            console.error("error: ", error);
+            reject(error);
+          }
+        } else {
+          console.log("");
+          reject("Unable to locate mp3 file");
+        }
+      });
+    } else {
+      console.log("transcript-" + result + ".txt exists already retrieving: ");
+      let retrieval = "";
+      fs.readFile("transcript-" + result + ".txt", "utf-8", (err, data) => {
+        if (data) {
+          resolve(data);
+        } else if (err) {
+          console.error("error: ", err);
+          reject(err);
+        }
+      });
+    }
+  });
 };

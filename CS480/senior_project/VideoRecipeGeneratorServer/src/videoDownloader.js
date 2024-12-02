@@ -59,7 +59,8 @@ exports.downloadVideoYT = async function downloadVideo(aUrl) {
         });
     } else {
       console.log("data should exist already, retrieving: ");
-      return outputFilePath;
+      let newOutputFilePath = outputFilePath.replace(/\\/g, "/");
+      resolve(newOutputFilePath);
     }
   });
 };

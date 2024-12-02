@@ -19,9 +19,9 @@ fileId = sys.argv[2]
 transcript = sys.argv[1]
 sentences = transcript.split(".")
 
-file = open("../parseFiles/parse-" + fileId, "x")
-file.close()
-file = open("../parseFiles/parse-" + fileId, "a")
+
+
+file = open("../parse-" + fileId, "a")
 parse = parse_multiple_ingredients(sentences)
 count = 0
 for ingredient in parse:
