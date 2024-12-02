@@ -21,7 +21,7 @@ sentences = transcript.split(".")
 
 
 
-file = open("../parse-" + fileId, "a")
+file = open("../parse-" + fileId + ".txt", "a")
 parse = parse_multiple_ingredients(sentences)
 count = 0
 for ingredient in parse:
