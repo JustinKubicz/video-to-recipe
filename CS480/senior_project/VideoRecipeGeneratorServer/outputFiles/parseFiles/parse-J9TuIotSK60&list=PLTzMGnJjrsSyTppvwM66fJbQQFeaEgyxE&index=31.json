@@ -1,0 +1,33 @@
+{
+  "name": "Steamed Date Pudding with Butterscotch Sauce",
+  "ingredients": [
+    {"ingredient": "Flour", "amount": "BLANK"},
+    {"ingredient": "Dates", "amount": "BLANK"},
+    {"ingredient": "Orange zest", "amount": "BLANK"},
+    {"ingredient": "Brown sugar", "amount": "BLANK"},
+    {"ingredient": "Treacle", "amount": "BLANK"},
+    {"ingredient": "Egg", "amount": "1"},
+    {"ingredient": "Milk", "amount": "BLANK"},
+    {"ingredient": "Butter", "amount": "BLANK"},
+    {"ingredient": "Brown sugar", "amount": "BLANK"},
+    {"ingredient": "Golden syrup", "amount": "BLANK"},
+    {"ingredient": "Salt", "amount": "Pinch"},
+    {"ingredient": "Vanilla seeds", "amount": "BLANK"},
+    {"ingredient": "Cream", "amount": "BLANK"}
+
+  ],
+  "instructions": [
+    "Sieve the flour.",
+    "Chop the dates.",
+    "Add orange zest, brown sugar, and treacle to the flour and dates.",
+    "Lightly whisk an egg and mix into the milk.",
+    "Add the egg and milk mixture to the dry ingredients and mix.",
+    "Lightly grease a pudding mold.",
+    "Pour the batter into the mold.",
+    "Cover the mold tightly with parchment paper and foil.",
+    "Place the mold in a pan of water and steam for approximately two hours with the lid on.",
+    "To make the butterscotch sauce: Add butter, brown sugar, golden syrup, a pinch of salt, and vanilla seeds to a pan.",
+    "Melt and combine over a medium heat, stirring.",
+    "Stir in cream and simmer until thickened."
+  ]
+}

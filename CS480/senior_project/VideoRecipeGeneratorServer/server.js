@@ -3,36 +3,47 @@ import cors from "cors";
 import VideoDownloader from "./src/videoDownloader.js";
 import TranscriptGrabber from "./src/transcriptGrabber.js";
 import { execFile } from "child_process";
-import RecipesParser from "./src/recipesParser.js";
+import fs from "fs";
 
 const app = express();
 /*
+EXAMPLE URL: https://www.youtube.com/shorts/Qwwm7zlpMPs
 TODO:
-  . If files exist, don't remake them, especially the transcript.
+
+
 */
 app.use(cors());
 app.use(json());
 app.use(urlencoded({ extended: true }));
 const transcriptor = new TranscriptGrabber();
-const parser = new RecipesParser();
 const downloader = new VideoDownloader();
 const port = 5000;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
 async function parseIngredientsWithPython(transcript, id) {
-  execFile(
-    "python",
-    ["src/ingredientParserNlp.py", transcript, id],
-    (error, stdout, stderr) => {
-      if (error) {
-        console.error("Error calling Python script:", error);
+  return new Promise((resolve, reject) => {
+    execFile(
+      "python",
+      ["src/geminiParser.py", transcript, id],
+      (error, stdout, stderr) => {
+        if (error) {
+          console.error("Error calling Python script:", error);
+        }
+        if (stderr) {
+          console.error("Standard error from Python script:", stderr);
+        }
+        if (stdout) {
+          console.log("Python complete.");
+        }
+        if (fs.existsSync("./outputFiles/parseFiles/parse-" + id + ".json")) {
+          resolve("./outputFiles/parseFiles/parse-" + id + ".json");
+        } else {
+          reject("failed to create parse file.");
+        }
       }
-      if (stderr) {
-        console.error("Standard error from Python script:", stderr);
-      }
-    }
-  );
+    );
+  });
 }
 async function start(aUrl) {
   if (aUrl.includes("shorts")) {
@@ -48,44 +59,40 @@ async function start(aUrl) {
     return await downloader.downloadVideo(aUrl);
   }
 }
-
+async function readJSON(aFilePath) {
+  return new Promise((resolve, reject) => {
+    let jsonData = "";
+    fs.readFile(aFilePath, (error, data) => {
+      if (data) {
+        jsonData = JSON.parse(data);
+        resolve(jsonData);
+      } else if (error) {
+        console.error("error: ", error);
+        reject(error);
+      }
+    });
+  });
+}
 app.post("/api/generate", async (req, res) => {
   try {
+    const event = new Event("progress");
     const { url } = req.body;
     console.log("POST RECEIVED: ", url);
     const videoPath = await start(url);
+
     const transcript = await transcriptor.generateTranscript(videoPath);
-    // await parseIngredientsWithPython(
-    //   transcript,
-    //   videoDownloader.decipherYTVideoID(url)
-    // );
-    const parse = await parser.doParse(
+
+    await parseIngredientsWithPython(
       transcript,
       downloader.decipherYTVideoID(url)
-    );
-
-    res.status(200).json({ videoPath });
-    console.log("VIDEO DOWNLOADED: ", videoPath);
+    ).then(async (data) => {
+      await readJSON(data).then((data2) => {
+        //if data2 changes here, it must change in recipe.jsx
+        res.status(200).json({ data2 });
+      });
+    });
   } catch (error) {
     console.error("Error processing video:", error);
-    res.status(500).json({ error: "Error processing video" });
+    res.status(500).json({ error });
   }
 });
-
-// function decipherYTVideoID(aUrl) {
-//   if (aUrl.includes("shorts")) {
-//     //if yt shorts, convert to watch url and proceed like normal yt
-//     let modifiedUrl = aUrl.replace("shorts/", "watch?v=");
-//     aUrl = modifiedUrl;
-//   }
-//   let pattern = /.*(\w{5}\?\w\=)/g; //thanks Sarkela!
-//   let match = pattern.exec(aUrl);
-//   if (match) {
-//     let matchEndIndex = match[0].length;
-//     let result = aUrl.slice(matchEndIndex).trim();
-//     //   console.log("Original String: ", aUrl);
-//     //   console.log("Match: ", match[0]);
-//     //   console.log("VideoId: ", result);
-//     return result;
-//   }
-// }

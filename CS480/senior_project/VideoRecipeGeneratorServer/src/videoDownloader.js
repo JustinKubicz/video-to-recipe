@@ -1,7 +1,6 @@
 import pkg from "ytdlp-nodejs"; //https://github.com/iqbal-rashed/ytdlp-nodejs
 import ProgressBar from "progress";
 import { existsSync } from "fs";
-import { join } from "path";
 
 class VideoDownloader {
   constructor() {}
@@ -32,7 +31,7 @@ class VideoDownloader {
       const bar = new ProgressBar(":bar :percent", { total: 100 });
       console.log("DOWNLOADING: ", aUrl);
 
-      const outputDir = "../outputFiles/videoFiles/";
+      const outputDir = "./outputFiles/videoFiles/";
       const outputFilePath = outputDir + id + ".webm";
       if (!existsSync(outputFilePath)) {
         pkg

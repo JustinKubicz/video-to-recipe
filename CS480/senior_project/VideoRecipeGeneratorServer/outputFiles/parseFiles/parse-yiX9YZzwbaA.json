@@ -1,0 +1,31 @@
+{
+  "name": "Hungarian Goulash",
+  "ingredients": [
+    {"ingredient": "Olive oil", "amount": "BLANK"},
+    {"ingredient": "Beef chuck", "amount": "a little over 2 pounds, cubed"},
+    {"ingredient": "Salt", "amount": "BLANK"},
+    {"ingredient": "Pepper", "amount": "BLANK"},
+    {"ingredient": "Onion", "amount": "1 large, chopped"},
+    {"ingredient": "Paprika", "amount": "1/4 cup"},
+    {"ingredient": "Garlic", "amount": "BLANK"},
+    {"ingredient": "Bell peppers", "amount": "2, chopped"},
+    {"ingredient": "Tomatoes", "amount": "2 medium, chopped"},
+    {"ingredient": "Caraway seeds", "amount": "BLANK"},
+    {"ingredient": "Beef broth", "amount": "3 cups"},
+    {"ingredient": "Bay leaves", "amount": "2"},
+    {"ingredient": "Potatoes", "amount": "3 large, chopped"},
+    {"ingredient": "Carrots", "amount": "2 large, chopped"}
+  ],
+  "instructions": [
+    "Add olive oil to a pot.",
+    "Season cubed beef chuck with salt and pepper.",
+    "Sear beef in batches until browned. Transfer to a plate.",
+    "Reduce heat. Add chopped onion to the pot.",
+    "Remove pot from heat, stir in paprika.",
+    "Return pot to heat. Add garlic, chopped bell peppers, chopped tomatoes, caraway seeds, beef broth, bay leaves, and salt and pepper.",
+    "Simmer for about 1 hour and 30 minutes.",
+    "Add chopped potatoes and carrots.",
+    "Add more liquid if needed to achieve desired soup consistency.",
+    "Cover and simmer for 20 minutes."
+  ]
+}

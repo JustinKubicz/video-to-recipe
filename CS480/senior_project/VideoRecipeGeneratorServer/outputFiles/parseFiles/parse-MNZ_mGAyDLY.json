@@ -1,0 +1,28 @@
+{
+  "name": "Greatest Carnitas Ever",
+  "ingredients": [
+    {"ingredient": "Pork", "amount": "BLANK"},
+    {"ingredient": "Salt", "amount": "BLANK"},
+    {"ingredient": "Lime", "amount": "BLANK"},
+    {"ingredient": "Cinnamon", "amount": "BLANK"},
+    {"ingredient": "Bay leaf", "amount": "BLANK"},
+    {"ingredient": "Tomatillos", "amount": "BLANK"},
+    {"ingredient": "Garlic", "amount": "BLANK"},
+    {"ingredient": "Tortillas", "amount": "BLANK"},
+    {"ingredient": "Baking powder", "amount": "BLANK"},
+    {"ingredient": "Water", "amount": "BLANK"},
+    {"ingredient": "White onion", "amount": "BLANK"}
+  ],
+  "instructions": [
+    "Season pork generously with salt.",
+    "Place pork in a large pot (or Dutch oven).",
+    "Add lime, cinnamon, and bay leaf.",
+    "Cook over low heat, allowing the pork to slowly braise for a couple of hours.",
+    "While pork cooks, prepare the tomatillo salsa: combine tomatillos, garlic, and a little salt.",
+    "Prepare the tortillas:  Mix together tortillas, baking powder, a little salt, and water.",
+    "Form the tortilla mixture into balls.",
+    "Cook the tortilla balls (method not specified in video).",
+    "Once the pork is cooked, shred it.",
+    "Serve the carnitas in tortillas with the tomatillo salsa and white onion as toppings."
+  ]
+}

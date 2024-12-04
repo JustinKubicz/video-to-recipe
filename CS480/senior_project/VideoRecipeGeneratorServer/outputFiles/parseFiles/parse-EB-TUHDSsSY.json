@@ -1,0 +1,32 @@
+{
+  "name": "Crispy Soy Garlic Tofu",
+  "ingredients": [
+    {"ingredient": "Extra-firm tofu", "amount": "BLANK"},
+    {"ingredient": "Garlic", "amount": "BLANK"},
+    {"ingredient": "Regular soy sauce", "amount": "BLANK"},
+    {"ingredient": "Dark soy sauce", "amount": "BLANK"},
+    {"ingredient": "Oyster sauce or vegetarian stir-fry sauce", "amount": "BLANK"},
+    {"ingredient": "Shaoxing wine", "amount": "BLANK"},
+    {"ingredient": "Sugar", "amount": "BLANK"},
+    {"ingredient": "Rice vinegar", "amount": "BLANK"},
+    {"ingredient": "Cornstarch", "amount": "BLANK"},
+    {"ingredient": "Water", "amount": "BLANK"},
+    {"ingredient": "Vegetable oil", "amount": "BLANK"},
+    {"ingredient": "Green onions", "amount": "BLANK"},
+    {"ingredient": "Sesame seeds", "amount": "BLANK"}
+  ],
+  "instructions": [
+    "Dice extra-firm tofu and set aside.",
+    "Combine garlic, regular soy sauce, dark soy sauce, oyster sauce (or vegetarian stir-fry sauce), Shaoxing wine, sugar, rice vinegar, cornstarch, and water in a bowl.",
+    "Spread cornstarch on a plate.",
+    "Generously coat the tofu in cornstarch.",
+    "Over medium heat, add vegetable oil to a pan and add the coated tofu.",
+    "Fry tofu on both sides until crispy.",
+    "Remove tofu from pan and set aside.",
+    "Add the sauce to the pan and simmer to reduce.",
+    "Add the crispy tofu back to the pan.",
+    "Mix to coat the tofu evenly in the sauce.",
+    "Garnish with green onions and sesame seeds.",
+    "Remove from heat and enjoy."
+  ]
+}

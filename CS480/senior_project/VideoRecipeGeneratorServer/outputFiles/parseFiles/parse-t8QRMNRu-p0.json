@@ -1,0 +1,13 @@
+{
+  "name": "Marry Me Chicken",
+  "ingredients": [
+    {"ingredient": "Boneless, skinless chicken breasts", "amount": "BLANK"},
+    {"ingredient": "Tomato paste", "amount": "BLANK"},
+    {"ingredient": "Oregano", "amount": "BLANK"},
+    {"ingredient": "Heavy cream", "amount": "BLANK"},
+    {"ingredient": "Sun-dried tomatoes", "amount": "BLANK"}
+  ],
+  "instructions": [
+    "BLANK" 
+  ]
+}

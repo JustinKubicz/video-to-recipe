@@ -1,0 +1,28 @@
+{
+  "name": "Egg Fried Rice",
+  "ingredients": [
+    {"ingredient": "cooked rice", "amount": "3 cups"},
+    {"ingredient": "eggs", "amount": "3"},
+    {"ingredient": "soy sauce", "amount": "2 tablespoons"},
+    {"ingredient": "sesame oil", "amount": "1 tablespoon"},
+    {"ingredient": "vegetable oil", "amount": "1 tablespoon"},
+    {"ingredient": "green onions", "amount": "2, chopped"},
+    {"ingredient": "peas", "amount": "1/2 cup, frozen"},
+    {"ingredient": "carrots", "amount": "1/2 cup, diced"},
+    {"ingredient": "salt", "amount": "to taste"},
+    {"ingredient": "pepper", "amount": "to taste"}
+
+  ],
+  "instructions": [
+    "Heat vegetable oil in a wok or large skillet over medium-high heat.",
+    "Whisk eggs in a bowl and pour into the hot wok. Scramble until cooked through.",
+    "Remove the scrambled eggs from the wok and set aside.",
+    "Add cooked rice to the wok and stir-fry for 2-3 minutes until heated through.",
+    "Add carrots and peas and stir-fry for another minute until heated through.",
+    "Stir in sesame oil and soy sauce.",
+    "Add the scrambled eggs back into the wok and combine with the rice and vegetables.",
+    "Season with salt and pepper to taste.",
+    "Garnish with chopped green onions.",
+    "Serve hot."
+  ]
+}

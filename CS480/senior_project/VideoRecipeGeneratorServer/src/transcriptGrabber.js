@@ -1,4 +1,3 @@
-import { YoutubeTranscript } from "youtube-transcript"; //https://www.npmjs.com/package/youtube-transcript YOUTUBE TRANSCRIPT FETCHER
 import { OpenAI } from "openai";
 import ffmpeg from "fluent-ffmpeg"; //https://www.npmjs.com/package/fluent-ffmpeg
 
@@ -43,10 +42,10 @@ class TranscriptGrabber {
       }
       if (
         !existsSync(
-          "../outputFiles/transcriptFiles/transcript-" + result + ".txt"
+          "./outputFiles/transcriptFiles/transcript-" + result + ".txt"
         )
       ) {
-        convertToMp3(aFilePath).then(async (mp3) => {
+        this.convertToMp3(aFilePath).then(async (mp3) => {
           console.log("starting transcription: ", mp3);
           if (existsSync(mp3)) {
             try {
@@ -58,7 +57,7 @@ class TranscriptGrabber {
                   timestamp_granularities: ["word"],
                 });
               let writeStream = createWriteStream(
-                "../outputFiles/transcriptFiles/transcript-" + result + ".txt"
+                "./outputFiles/transcriptFiles/transcript-" + result + ".txt"
               );
               writeStream.write(transcription.text, () => {
                 resolve(transcription.text);
@@ -74,13 +73,13 @@ class TranscriptGrabber {
         });
       } else {
         console.log(
-          "../outputFiles/transcriptFiles/transcript-" +
+          "./outputFiles/transcriptFiles/transcript-" +
             result +
             ".txt exists already retrieving: "
         );
         let retrieval = "";
         readFile(
-          "../outputFiles/transcriptFiles/transcript-" + result + ".txt",
+          "./outputFiles/transcriptFiles/transcript-" + result + ".txt",
           "utf-8",
           (err, data) => {
             if (data) {

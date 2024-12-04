@@ -1,7 +1,11 @@
-import { useState, useEffect } from 'react'
+
 import "./styles.css"
-
-
+import 'bootstrap/dist/css/bootstrap.min.css';
+import MyNavbar from "./Navbar"
+import SignIn from '../pages/SignIn';
+import MyRecipes from '../pages/MyRecipes';
+import Home from '../pages/home';
+import { Route, Routes } from "react-router-dom";
 function App() {
 
   //const [backendData, setBackendData] = useState([{}]);
@@ -28,35 +32,26 @@ function App() {
   //     setBackendData({ error: 'Failed to fetch data' });
   //   })
   // }, []);
-  const [newURL, setNewURL] = useState("");
-  const [recipe, setRecipe] = useState("");
-  async function handleSub(event) {
-    event.preventDefault();
-    try {
-      const response = await fetch('http://localhost:5000/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: newURL })
-      }
+  /*  <form onSubmit={handleSub} className="new-item-form">
+          <div className="form-row">
+            <label htmlFor="link">Enter a valid youtube URL: </label>
+            <input value={newURL} onChange={event => setNewURL(event.target.value)} type="text" id="link"></input>
+          </div>
+          <button className="btn">Generate</button>
+        </form>*/
 
-      );
-      console.log("POST Sent for: ", newURL);
-      const data = await response.json();
-      //setRecipe(data.recipe);
-      console.log('here is data: ', data);
-    } catch (error) {
-      console.error('Error processing video:', error);
-    }
-  };
+
   return (
     <>
-      <form onSubmit={handleSub} className="new-item-form">
-        <div className="form-row">
-          <label htmlFor="link">Enter a valid youtube URL: </label>
-          <input value={newURL} onChange={event => setNewURL(event.target.value)} type="text" id="link"></input>
-        </div>
-        <button className="btn">Generate</button>
-      </form>
+      <MyNavbar />
+      <div className="container">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/Sign-In" element={<SignIn />} />
+          <Route path="/MyRecipes" element={<MyRecipes />} />
+        </Routes>
+      </div>
+
     </>
   )
 }
