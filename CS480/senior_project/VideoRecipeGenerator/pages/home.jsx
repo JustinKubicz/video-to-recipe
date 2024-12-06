@@ -6,32 +6,46 @@ import Recipe from '../pages/Recipe';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 
 export default function Home() {
-  let data = {};
-
+  const [formSubmitted, triggerProgressBar] = useState(false);
   const [newURL, setNewURL] = useState("");
   const [recipe, setRecipe] = useState(null);
   const [progress, setProgress] = useState(0);
+  const [recipeId, setRecipeId] = useState("");
+
+  async function sleep() {
+    return new Promise(resolve => {
+      setTimeout(resolve, 150);
+    })
+  }
+  async function animateProgressBar(start, end) {
+    for (let i = start; i <= end; i++) {
+
+      setProgress(i);
+      await sleep();
+    }
+  }
+
   async function handleSub(event) {
-    setProgress(25);
+    triggerProgressBar(true);
+    animateProgressBar(0, 100);
     event.preventDefault();
     try {
-      setProgress(45);
       const response = await fetch('http://localhost:5000/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: newURL })
       }
       );
-      setProgress(72);
       console.log("POST Sent for: ", newURL);
-      setProgress(93);
-      data = await response.json();
-      setProgress(97);
+      let data = await response.json();
       //setRecipe(data.recipe);
       console.log('here is data: ', data);
+      console.log(data.data);
+      console.log(data.id);
+      setRecipeId(data.id);
       setProgress(100);
-      setRecipe(data);
-
+      triggerProgressBar(false);
+      setRecipe(data.data);
     } catch (error) {
       console.error('Error processing video:', error);
     }
@@ -50,8 +64,8 @@ export default function Home() {
         <Button variant="primary" type="submit">
           Create Recipe 🍽
         </Button><br />
-        <ProgressBar striped animated now={progress} />
-        <Recipe toRender={recipe} />
+        {formSubmitted && <ProgressBar striped animated now={progress} />}
+        <Recipe toRender={recipe} recipeId={recipeId} />
       </Form >
 
 

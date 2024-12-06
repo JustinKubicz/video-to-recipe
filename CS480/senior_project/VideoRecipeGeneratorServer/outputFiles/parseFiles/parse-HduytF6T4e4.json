@@ -1,0 +1,25 @@
+{
+  "name": "One Tray Baked Caramelized Onion Pasta",
+  "ingredients": [
+    {"ingredient": "Pasta", "amount": "BLANK"},
+    {"ingredient": "Onions", "amount": "BLANK"},
+    {"ingredient": "Garlic", "amount": "BLANK"},
+    {"ingredient": "Lemon Juice", "amount": "BLANK"},
+    {"ingredient": "Greens (e.g., spinach, kale)", "amount": "BLANK"},
+    {"ingredient": "Coconut Milk", "amount": "BLANK"},
+    {"ingredient": "Olive Oil or other cooking oil", "amount": "BLANK"}, 
+    {"ingredient": "Salt and Pepper", "amount": "To taste"}
+  ],
+  "instructions": [
+    "Preheat oven to a suitable temperature for caramelizing onions (this will depend on your oven and the amount of onions,  approximately 375°F (190°C) is a good starting point).",
+    "Place onions in a single layer on a baking tray. Drizzle with oil, salt and pepper.",
+    "Bake onions in the preheated oven until caramelized (check periodically, time will depend on your oven and amount of onions).",
+    "Once onions are caramelized, remove from oven.",
+    "Squeeze garlic over the caramelized onions.",
+    "Add lemon juice to the onions.",
+    "Add your choice of greens to the baking tray.",
+    "Stir in coconut milk.",
+    "Stir in cooked pasta.",
+    "Serve immediately."
+  ]
+}

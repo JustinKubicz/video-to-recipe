@@ -1,7 +1,7 @@
 from google.cloud import aiplatform
 import sys
 
-# TODO: CHECK IF OUTPUT FILE ALREADY EXISTS, DON'T REMAKE IF SO
+
 # https://cloud.google.com/vertex-ai/docs/python-sdk/use-vertex-ai-python-sdk
 
 # https://console.cloud.google.com/vertex-ai/publishers/google/model-garden/gemini-pro
@@ -23,13 +23,13 @@ def get_chat_response(chat: ChatSession, prompt: str):
 
 transcript = sys.argv[1]
 fileID = sys.argv[2]
-
 prompt = (
-    "From the following transcript of a recipe video, generate a recipe based on the recipe in the video with an ingredients section and instructions section: "
+    "From the following transcript of a recipe video, generate a recipe with an ingredients section and an instructions section: "
     + transcript
-    + ": Please also use the following JSON SCHEMA:"
-    + ' recipe = {"name" : str, "ingredients" : [{"ingredient" : str, "amount" : str}], "instructions" : [str] }. If you are missing a piece of information simply substitute with "BLANK". Thank you!'
+    + ". Please use the following JSON schema: "
+    + '{"name": "string", "ingredients": [{"ingredient": "string", "amount": "string"}], "instructions": ["string"]}. If any information is missing, substitute with "BLANK". Thank you!'
 )
+
 stream = open("./outputFiles/parseFiles/parse-" + fileID + ".json", "w")
 
 toWrite = get_chat_response(
@@ -39,15 +39,14 @@ toWrite = get_chat_response(
 
 
 def scrub_lines(text):
-    lines = text.split("\n")
+    lines = text.strip().split("\n")
     answer = []
-    for line in lines:
-        if line == "```json" or line == "```":
+
+    for index, line in enumerate(lines):
+        if index == 0 or index == len(lines) - 1:
             continue
         else:
             answer.append(line)
-    for line in answer:
-        print(line)
     return answer
 
 

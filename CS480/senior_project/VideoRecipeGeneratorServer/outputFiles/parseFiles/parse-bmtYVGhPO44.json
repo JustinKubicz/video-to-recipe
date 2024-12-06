@@ -1,0 +1,30 @@
+{
+  "name": "Salt-Crusted Prime Rib with Holiday Chimichurri",
+  "ingredients": [
+    {"ingredient": "Prime Rib", "amount": "9 pounds (with a large ribeye cap)"},
+    {"ingredient": "Kosher Salt", "amount": "9 pounds"},
+    {"ingredient": "Red Wine", "amount": "1 whole bottle"},
+    {"ingredient": "Rosemary", "amount": "BLANK"},
+    {"ingredient": "Thyme", "amount": "BLANK"},
+    {"ingredient": "Olive Oil", "amount": "BLANK"},
+    {"ingredient": "Cowboy Butter", "amount": "BLANK"},
+    {"ingredient": "Red Wine Vinegar", "amount": "BLANK"},
+    {"ingredient": "Garlic", "amount": "BLANK"},  
+    {"ingredient": "Parsley", "amount": "BLANK"}, 
+    {"ingredient": "Other Chimichurri Herbs (e.g., oregano, cilantro)", "amount": "BLANK"}
+
+  ],
+  "instructions": [
+    "Reduce a whole bottle of red wine in a saucepan. Infuse with rosemary and thyme.",
+    "Combine the reduced red wine with 9 pounds of kosher salt to create a ‘kinetic sand’ like consistency.",
+    "Layer some of the red wine salt mixture in the bottom of a roasting pan.",
+    "Place the 9-pound prime rib on top of the salt layer.",
+    "Build walls of the salt mixture around the prime rib, completely encasing it.",
+    "Roast the prime rib until it reaches an internal temperature of 125°F (52°C).",
+    "Remove the prime rib from the oven and carefully break away the salt crust.", 
+    "Sear the prime rib over high heat until it is perfectly seared.",
+    "Let the prime rib rest for at least 30 minutes.",
+    "While the prime rib rests, prepare the chimichurri: Chop BLANK of garlic, BLANK of parsley and other desired herbs. Whisk together with red wine vinegar and olive oil.",
+    "Slice the rested prime rib and serve with the holiday chimichurri."
+  ]
+}

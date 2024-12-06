@@ -1,0 +1,34 @@
+{
+  "name": "Greatest 20-Minute Ramen of Your Life",
+  "ingredients": [
+    {"ingredient": "Shallots", "amount": "2, peeled, finely diced"},
+    {"ingredient": "Garlic", "amount": "7 cloves, finely chopped"},
+    {"ingredient": "Ginger", "amount": "1 inch, grated"},
+    {"ingredient": "Butter", "amount": "BLANK"},
+    {"ingredient": "Corn kernels", "amount": "BLANK"},
+    {"ingredient": "Salt", "amount": "To taste"},
+    {"ingredient": "Oil", "amount": "BLANK"},
+    {"ingredient": "Ground pork", "amount": "1/2 pound"},
+    {"ingredient": "Sesame oil", "amount": "BLANK"},
+    {"ingredient": "Sugar", "amount": "1 tablespoon"},
+    {"ingredient": "Spicy chili crisp", "amount": "BLANK"},
+    {"ingredient": "Miso paste", "amount": "1/4 cup"},
+    {"ingredient": "Chicken stock", "amount": "1 1/2 quarts"},
+    {"ingredient": "Handashi (bonito flakes)", "amount": "1 tablespoon"},
+    {"ingredient": "Ramen noodles", "amount": "BLANK"},
+    {"ingredient": "Water", "amount": "BLANK"},
+    {"ingredient": "Green onions", "amount": "BLANK"},
+    {"ingredient": "Eggs", "amount": "BLANK"}
+  ],
+  "instructions": [
+    "In a pan, melt butter, add corn, and salt. Stir until hot and the butter is browned.",
+    "In a separate pan or wok, heat oil over medium-high heat. Add ground pork and sear until browned, then mash it up.",
+    "Set the pork aside. Add sesame oil to the pan and sauté the shallots, garlic, and ginger for about 2 minutes.",
+    "Stir in sugar and spicy chili crisp.",
+    "Return the pork to the pan. Add miso paste, chicken stock, and handashi.",
+    "Bring to a simmer, then reduce heat.",
+    "Boil water in a separate pot. Cook ramen noodles according to package directions, then drain.",
+    "Add the cooked ramen noodles to the broth.",
+    "Serve with green onions and a soft boiled egg (optional)."
+  ]
+}
