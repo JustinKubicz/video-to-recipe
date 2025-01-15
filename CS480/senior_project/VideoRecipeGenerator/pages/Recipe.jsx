@@ -29,7 +29,7 @@ export default function Recipe(props) {
     if (props.toRender) {
         const { toRender } = props;
 
-        //data2 here comes from server.js
+
         return (
             <>
 

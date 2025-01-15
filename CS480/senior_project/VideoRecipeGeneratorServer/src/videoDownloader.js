@@ -17,9 +17,6 @@ class VideoDownloader {
       if (match) {
         let matchEndIndex = match[0].length;
         let result = aUrl.slice(matchEndIndex).trim();
-        //   console.log("Original String: ", aUrl);
-        //   console.log("Match: ", match[0]);
-        //   console.log("VideoId: ", result);
         return result;
       }
     }

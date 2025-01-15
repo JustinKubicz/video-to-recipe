@@ -58,7 +58,7 @@ async function parseIngredientsWithPython(transcript, id) {
     }
   });
 }
-async function start(aUrl) {
+async function startGeneration(aUrl) {
   if (aUrl.includes("shorts")) {
     //if yt shorts, convert to watch url and proceed like normal yt
     let modifiedUrl = aUrl.replace("shorts/", "watch?v=");
@@ -91,7 +91,7 @@ app.post("/api/generate", async (req, res) => {
     const event = new Event("progress");
     const { url } = req.body;
     console.log("POST RECEIVED: ", url);
-    const videoPath = await start(url);
+    const videoPath = await startGeneration(url);
 
     const transcript = await transcriptor.generateTranscript(videoPath);
 
@@ -160,17 +160,29 @@ app.post("/api/login", async (req, res) => {
 });
 
 app.post("/api/save", async (req, res) => {
-  let email = req.body.email;
-  let toSave = req.body.id;
-  console.log("saving " + toSave + "\nto " + email);
-  await pool.myPool
-    .query(`SELECT UserId FROM Users WHERE Email='${email}';`)
-    .then(async (data) => {
-      console.log(data.rows[0].userid);
-      await pool.myPool.query(
-        `INSERT INTO User_Recipes(VideoID, UserId) VALUES  ('${toSave}',${data.rows[0].userid})`
-      );
+  try {
+    let email = req.body.email;
+    let toSave = req.body.id;
+    console.log("saving " + toSave + "\nto " + email);
+    await pool.myPool
+      .query(`SELECT UserId FROM Users WHERE Email='${email}';`)
+      .then(async (data) => {
+        console.log(data.rows[0].userid);
+        await pool.myPool.query(
+          `INSERT INTO User_Recipes(VideoID, UserId) VALUES  ('${toSave}',${data.rows[0].userid})`
+        );
 
-      res.status(200).send(`Successfully Saved ${toSave}`);
-    });
+        res.status(200).send(`Successfully Saved ${toSave}`);
+      });
+  } catch (error) {
+    console.error("error: /save", error);
+    res.status(500).send("error: /save", error);
+  }
+});
+app.get("api/buildMyRecipes", async (req, res) => {
+  try {
+  } catch (error) {
+    console.error("error: /buildMyRecipes", error);
+    res.status(500).send("error: /buildMyRecipes", error);
+  }
 });

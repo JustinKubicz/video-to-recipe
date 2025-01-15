@@ -15,7 +15,7 @@ class TranscriptGrabber {
     return new Promise((resolve, reject) => {
       let result = aFilePath + ".mp3";
       ffmpeg(aFilePath)
-        .toFormat("mp3") // You can change the format as needed
+        .toFormat("mp3")
         .on("end", () => {
           console.log("Conversion finished");
           resolve(result);

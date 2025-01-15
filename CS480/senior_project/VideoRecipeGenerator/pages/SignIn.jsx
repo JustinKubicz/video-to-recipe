@@ -9,9 +9,6 @@ import { useState } from "react";
 export default function SignIn() {
   const signIn = useSignIn()
   const [formData, setFormData] = useState({ email: '', password: '' })
-  // if (nav) {
-  //   return <Redirect to="/MyRecipes"></Redirect>
-  // }
   const onSubmit = async (e) => {
     //https://authkit.arkadip.dev/reference/react-auth-kit/hooks/useSignIn/#signinconfig-parameters
     e.preventDefault()
@@ -41,12 +38,6 @@ export default function SignIn() {
       })
   }
   return (
-    // <form onSubmit={onSubmit}>
-    //   <input type={"email"} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
-    //   <input type={"password"} onChange={(e) => setFormData({ ...formData, password: e.target.value })} />
-
-    //   <button>Submit</button>
-    // </form>
     <Form onSubmit={onSubmit}>
       <Form.Group className="mb-3" controlId="Main">
         <Form.Label>Login Email:</Form.Label>

@@ -2,12 +2,7 @@
 //https://www.youtube.com/watch?v=Ud5xKCYQTjM
 import MyPool from "../config/db.js";
 import bcrypt from "bcrypt";
-/*
-async function storeAccessToken(email, accessToken) {
-  await pool.query(
-    `UPDATE appointments SET zoom_access_token = ${accessToken} WHERE student_email = ${email}`
-  );
-}*/
+
 let pool = new MyPool();
 class userAuthenticator {
   constructor() {}
@@ -44,9 +39,9 @@ class userAuthenticator {
       const match = await bcrypt.compare(password, user.password);
 
       if (match) {
-        return 200; // Password matches
+        return 200;
       } else {
-        return "password compare fail"; // Password does not match
+        return "password compare fail";
       }
     } catch (error) {
       console.error("error: userAuthenticator.js", error);

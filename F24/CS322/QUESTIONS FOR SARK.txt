@@ -1,0 +1,1 @@
+Why is static a poor choice for defining methods that belong to the class object?
