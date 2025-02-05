@@ -18,9 +18,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/SignIn" element={<SignIn />} />
           <Route path="/MyRecipes" element={
-            // <RequireAuth loginPath="/Sign-In" >//I can't figure out fucking RequireAuth, maybe some day
             <MyRecipes />
-            // </RequireAuth>
           } />
           <Route path="/CreateAccount" element={
             <Create />

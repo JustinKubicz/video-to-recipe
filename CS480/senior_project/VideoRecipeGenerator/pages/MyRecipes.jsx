@@ -1,35 +1,122 @@
 import useIsAuthenticated from 'react-auth-kit/hooks/useIsAuthenticated';
 import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
-/*
-TODO:
-  Need To make a get to the server for all recipe JSONS, then render out Recipe components based on that result
-*/
-export default async function MyRecipes() {
-  const user = useAuthUser();
-  const nav = useNavigate();
-  const response = await fetch('http://localhost:5000/api/get', {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      "email": user.name
-    })
-  }).then((res) => {
-    if (res.ok) {
-      console.log(response);
-    } else {
-      console.error("error, MyRecipes.jsx: ", response.status);
+import { useState, useEffect } from 'react';
+import Button from 'react-bootstrap/Button';
+import Card from 'react-bootstrap/Card';
+import Recipe from '../pages/Recipe';
+import CloseButton from 'react-bootstrap/CloseButton'
+export default function MyRecipes() {
+  try {
+    const [selected, updateSelection] = useState(false);
+    const [selectedRecipe, setRecipe] = useState({});
+    const [userHasNoRecipesSaved, userHasNone] = useState(false);
+    const [DESTROY, itemDeleted] = useState(false);
+    const user = useAuthUser();
+    const nav = useNavigate();
+    const [response, setResponse] = useState([]);
+    useEffect(() => {
+      async function grabRecipes() {
+
+        let ans = await fetch(`http://localhost:5000/api/buildMyRecipes?email=${user.name}`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        }).then(async (res) => {
+          if (res.ok) {
+            res = await res.json();
+            console.log(res);
+            if (Array.isArray(res))
+              setResponse(res);
+            else {
+              userHasNone(true);
+            }
+          } else {
+            console.error("error, MyRecipes.jsx: ", res.status);
+          }
+        });
+        return ans;
+
+      }
+      grabRecipes();
+    }, [user.name])
+    console.log(response);
+    async function del(anItem, anIndex) {
+      //delete function
+      // 1. make delete fetch(), unfortunately need to go back and send ids as part of the jsons in order to properly look them up for deletion.
+      console.log(`Deleting ${anItem.videoId} from account: ${user.name}`)
+      await fetch(`http://localhost:5000/api/delete?email=${user.name}&id=${anItem.videoId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+      })
+        //2.in the then block starting where that recipe was in the array, shift everything on the right, left into that position
+        //    unless there is only one item in the array, in which case we need to just update userHasNoRecipesSaved to true. 
+        .then(
+          async (res) => {
+            if (res.ok) {
+              if (response.length == 1) userHasNone(true);
+              else setResponse(response.splice(anIndex));
+            } else {
+              console.error("error del function in MyRecipes: ", res.status);
+            }
+          }
+        )
     }
-  });
-  let recipes = response.payLoad;
+    if (!userHasNoRecipesSaved) {
 
+      if (!selected) {
 
-
-  return (
-    <p>My Recipes is coming soon my brotha</p>
-  )
-
+        return (
+          <div>
+            {
+              response.map((item, index) => {
+                return (
+                  <div key={index}>
+                    <Card style={{ width: '18rem' }}>
+                      <Card.Body>
+                        <Card.Title>{item.name}</Card.Title>
+                        <Button variant="primary" onClick={() => {
+                          updateSelection(true);
+                          setRecipe(item);
+                        }}>View</Button>
+                        <Button variant="secondary" onClick={async () => {
+                          await del(item, index);
+                          itemDeleted(!DESTROY);//should just trigger a rerender of the cards after a deletion
+                        }}>Delete</Button>
+                      </Card.Body>
+                    </Card>
+                  </div>
+                )
+              })
+            }
+          </div>
+        )
+      }
+      else {
+        return (
+          <div id="main">
+            <Recipe toRender={selectedRecipe} isAlreadySaved={true}>
+            </Recipe>
+            <CloseButton id="close" onClick={() => updateSelection(false)}></CloseButton>
+            <style>{`
+            #main{
+              position: relative;
+            }
+            #close{
+              position: absolute;
+              top: 10px;
+              left: -75px;
+            }
+            `}
+            </style>
+          </div>
+        )
+      }
+    } else {
+      return (<p>Try saving some recipes after you generate them!</p>)
+    }
+  } catch (err) {
+    console.error("MyRecipes Error: ", err);
+  }
 
 
 }

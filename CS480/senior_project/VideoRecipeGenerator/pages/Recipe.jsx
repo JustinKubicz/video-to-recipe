@@ -6,7 +6,7 @@ import Image from 'react-bootstrap/Image';
 import useIsAuthenticated from 'react-auth-kit/hooks/useIsAuthenticated';
 import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 export default function Recipe(props) {
-    const { recipeId } = props;
+    const { recipeId, toRender, isAlreadySaved } = props;
     const [isSaved, updateSaved] = useState(false);
     const isAuthenticated = useIsAuthenticated();
     const user = useAuthUser();
@@ -26,17 +26,16 @@ export default function Recipe(props) {
         console.log(response);
         updateSaved(true);
     }
-    if (props.toRender) {
-        const { toRender } = props;
-
+    if (toRender) {
 
         return (
+
             <>
 
                 <h2>{toRender.name}</h2>
                 <Button variant='secondary' type='button' onClick={handlePrinting}>Print This</Button>
                 {isAuthenticated ?
-                    (isSaved ? <p>Saved to My Recipes</p> : <Button variant='secondary' type='button' onClick={SaveToMyRecipes}>Save To My Recipes</Button>)
+                    (isSaved || isAlreadySaved ? <p>Saved to My Recipes</p> : <Button variant='secondary' type='button' onClick={SaveToMyRecipes}>Save To My Recipes</Button>)
                     : null}
                 <h3>Ingredients:</h3>
 

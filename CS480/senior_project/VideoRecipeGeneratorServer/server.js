@@ -111,7 +111,7 @@ app.post("/api/generate", async (req, res) => {
     });
   } catch (error) {
     console.error("Error processing video:", error);
-    res.status(500).json({ error });
+    res.status(500).send(error);
   }
 });
 
@@ -179,10 +179,40 @@ app.post("/api/save", async (req, res) => {
     res.status(500).send("error: /save", error);
   }
 });
-app.get("api/buildMyRecipes", async (req, res) => {
+app.get("/api/buildMyRecipes", async (req, res) => {
   try {
+    let email = req.query.email;
+    console.log("building myRecipes for: " + email);
+    await pool.myPool
+      .query(`SELECT UserId FROM Users WHERE Email='${email}';`)
+      .then(async (data) => {
+        console.log("user pulled: " + email + "userID: " + data.rows[0].userid);
+        let user = data.rows[0].userid;
+        await pool.myPool
+          .query(`SELECT videoid FROM user_recipes WHERE userId = '${user}';`)
+          .then(async (data) => {
+            let size = data.rows.length;
+            let result = [size];
+            for (let i = 0; i < data.rows.length; i++) {
+              result[i] = data.rows[i].videoid;
+              console.log(`USER ${email} saved recipe found: ${result[i]}`);
+            }
+            if (result.length != 0) {
+              for (let i = 0; i < result.length; i++) {
+                let temp = result[i];
+                result[i] = await readJSON(
+                  `./outputFiles/parseFiles/parse-${result[i]}.json`
+                );
+                result[i].videoId = temp;
+              }
+              res.status(200).json(result);
+            } else {
+              res.status(200).send(`'${email}': User has no recipes`);
+            }
+          });
+      });
   } catch (error) {
-    console.error("error: /buildMyRecipes", error);
-    res.status(500).send("error: /buildMyRecipes", error);
+    console.error("error: /buildMyRecipes: ", error);
+    res.status(500).send("error: /buildMyRecipes: " + error);
   }
 });
