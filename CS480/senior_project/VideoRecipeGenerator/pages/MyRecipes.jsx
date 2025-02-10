@@ -39,10 +39,10 @@ export default function MyRecipes() {
       }
       grabRecipes();
     }, [user.name])
-    console.log(response);
+
     async function del(anItem, anIndex) {
       //delete function
-      // 1. make delete fetch(), unfortunately need to go back and send ids as part of the jsons in order to properly look them up for deletion.
+      // 1. make delete fetch()
       console.log(`Deleting ${anItem.videoId} from account: ${user.name}`)
       await fetch(`http://localhost:5000/api/delete?email=${user.name}&id=${anItem.videoId}`, {
         method: 'DELETE',
@@ -53,14 +53,15 @@ export default function MyRecipes() {
         .then(
           async (res) => {
             if (res.ok) {
-              if (response.length == 1) userHasNone(true);
-              else setResponse(response.splice(anIndex));
+              if (response.length == 1) userHasNone(true); //if after deletion, there was only 1, just set userHasNone to true and the card will go away
+              else setResponse(response.splice(anIndex)); //else splice the cards and they'll rerender
             } else {
               console.error("error del function in MyRecipes: ", res.status);
             }
           }
         )
     }
+
     if (!userHasNoRecipesSaved) {
 
       if (!selected) {

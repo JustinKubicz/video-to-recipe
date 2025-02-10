@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 const { Pool } = pkg;
 dotenv.config();
-
+//https://node-postgres.com/apis/result
 class MyPool {
   constructor() {
     this.myPool = new Pool({

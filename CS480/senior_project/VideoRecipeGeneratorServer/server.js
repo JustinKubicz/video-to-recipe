@@ -216,3 +216,30 @@ app.get("/api/buildMyRecipes", async (req, res) => {
     res.status(500).send("error: /buildMyRecipes: " + error);
   }
 });
+
+app.delete("/api/delete", async (req, res) => {
+  try {
+    //email and videoid sent in query, looks up user
+    let email = req.query.email;
+    let videoId = req.query.id;
+    let userId;
+    console.log(`deleting ${videoId} from user: ${email}`);
+    await pool.myPool
+      .query(`SELECT userid FROM users WHERE email=${email}`)
+      .then((data) => {
+        userId = data.rows[0].userid;
+      });
+
+    await pool.myPool
+      .query(
+        `DELETE FROM user_recipes WHERE userid=${userId} AND videoId=${videoId}`
+      )
+      .then((data) => {
+        console.log(data);
+        res.status(200).send(data); //probably don't need to send this
+      });
+  } catch (error) {
+    console.log("api/delete error: ", error);
+    res.status(500).send(error);
+  }
+});

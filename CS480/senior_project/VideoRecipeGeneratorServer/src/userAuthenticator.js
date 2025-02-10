@@ -13,10 +13,12 @@ class userAuthenticator {
       const hashedPassword = await bcrypt.hash(password, salt);
       console.log(salt);
       console.log(hashedPassword);
-      pool.myPool.query(`INSERT INTO Users (Email,Password) VALUES($1,$2);`, [
-        email,
-        hashedPassword,
-      ]);
+      pool.myPool
+        .query(`INSERT INTO Users (Email,Password) VALUES($1,$2);`, [
+          email,
+          hashedPassword,
+        ])
+        .finally(await pool.end());
 
       return 200;
     } catch (error) {
@@ -27,10 +29,9 @@ class userAuthenticator {
 
   async loginUser(email, password) {
     try {
-      const result = await pool.myPool.query(
-        `SELECT Email, Password FROM Users WHERE Email = $1;`,
-        [email]
-      );
+      const result = await pool.myPool
+        .query(`SELECT Email, Password FROM Users WHERE Email = $1;`, [email])
+        .finally(await pool.end());
       const user = result.rows[0];
       console.log(user.email);
       console.log(user.password);
