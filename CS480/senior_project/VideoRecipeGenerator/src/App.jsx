@@ -1,13 +1,13 @@
 import "./styles.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import MyNavbar from "../src/MyNavbar";
-import SignIn from '../pages/SignIn';
-import MyRecipes from '../pages/MyRecipes';
-import Home from '../pages/Home';
+import SignIn from '../Components/SignIn.jsx';
+import MyRecipes from '../Components/MyRecipes';
+import Home from '../Components/Home';
 import { Route, Routes } from "react-router-dom";
 import RequireAuth from "react-auth-kit";
-import Create from "../pages/CreateAccount.jsx";
-import SignOut from '../pages/SignOut.jsx';
+import Create from "../Components/CreateAccount.jsx";
+import SignOut from '../Components/SignOut.jsx';
 
 function App() {
   return (

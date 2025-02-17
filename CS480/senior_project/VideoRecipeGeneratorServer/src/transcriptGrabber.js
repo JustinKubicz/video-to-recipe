@@ -1,16 +1,18 @@
 import { OpenAI } from "openai";
 import ffmpeg from "fluent-ffmpeg"; //https://www.npmjs.com/package/fluent-ffmpeg
-
+//https://ai.google.dev/gemini-api/docs/audio?lang=node
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleAIFileManager, FileState } from "@google/generative-ai/server";
+import fs from "fs";
 import { existsSync, createReadStream, createWriteStream, readFile } from "fs";
 
 class TranscriptGrabber {
   constructor() {
-    this.openAI = new OpenAI({
-      apiKey:
-        "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",
-    });
+    this.genAI = new GoogleGenerativeAI(
+      "AIzaSyDdxnxeMtA9yJgktnolLyqBzTgUUMOlpgQ"
+    ); //need to hide this
+    this.model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
   }
-
   async convertToMp3(aFilePath) {
     return new Promise((resolve, reject) => {
       let result = aFilePath + ".mp3";
@@ -22,7 +24,7 @@ class TranscriptGrabber {
         })
         .on("error", (err) => {
           console.error("Error during conversion:", err);
-          reject(err);
+          return reject(err);
         })
         .save(result);
     });
@@ -36,57 +38,70 @@ class TranscriptGrabber {
       if (match) {
         let matchEndIndex = match[0].length;
         result = aFilePath.slice(matchEndIndex).trim();
-        console.log("Original String: ", aFilePath);
-        console.log("Match: ", match[0]);
-        console.log("FileName before .txt: ", result);
+        console.log("transcriptGrabber.js: Original String: ", aFilePath);
+        console.log("transcriptGrabber.js: Match: ", match[0]);
+        console.log("transcriptGrabber.js: FileName before .txt: ", result);
       }
       if (
-        !existsSync(
+        !fs.existsSync(
           "./outputFiles/transcriptFiles/transcript-" + result + ".txt"
         )
       ) {
         this.convertToMp3(aFilePath).then(async (mp3) => {
-          console.log("starting transcription: ", mp3);
-          if (existsSync(mp3)) {
+          console.log("transcriptGrabber.js: starting transcription: ", mp3);
+          if (fs.existsSync(mp3)) {
             try {
-              const transcription =
-                await this.openAI.audio.transcriptions.create({
-                  file: createReadStream(mp3),
-                  model: "whisper-1",
-                  response_format: "verbose_json",
-                  timestamp_granularities: ["word"],
-                });
-              let writeStream = createWriteStream(
+              let fileManager = new GoogleAIFileManager(
+                "AIzaSyDdxnxeMtA9yJgktnolLyqBzTgUUMOlpgQ"
+              );
+
+              let uploadResult = await fileManager.uploadFile(mp3, {
+                mimeType: "audio/mp3",
+                displayName: "Audio sample",
+              });
+              let file = await fileManager.getFile(uploadResult.file.name);
+              if (file.state == FileState.FAILED)
+                throw new Error("Failed to connect to audio processing");
+              let writeStream = fs.createWriteStream(
                 "./outputFiles/transcriptFiles/transcript-" + result + ".txt"
               );
-              writeStream.write(transcription.text, () => {
-                resolve(transcription.text);
+
+              const geminiResponse = await this.model.generateContent([
+                "Please generate a transcript of this audio, thank you.",
+                {
+                  fileData: {
+                    fileUri: uploadResult.file.uri,
+                    mimeType: uploadResult.file.mimeType,
+                  },
+                },
+              ]);
+              writeStream.write(geminiResponse.response.text(), () => {
+                return resolve(geminiResponse.response.text());
               });
             } catch (error) {
-              console.error("error: ", error);
-              reject(error);
+              console.error("transcriptGrabber.js: error: ", error);
+              return reject(error);
             }
           } else {
             console.log("");
-            reject("Unable to locate mp3 file");
+            return reject("Unable to locate mp3 file");
           }
         });
       } else {
         console.log(
-          "./outputFiles/transcriptFiles/transcript-" +
+          "transcriptGrabber.js: ./outputFiles/transcriptFiles/transcript-" +
             result +
             ".txt exists already retrieving: "
         );
-        let retrieval = "";
-        readFile(
+        fs.readFile(
           "./outputFiles/transcriptFiles/transcript-" + result + ".txt",
           "utf-8",
           (err, data) => {
             if (data) {
-              resolve(data);
+              return resolve(data);
             } else if (err) {
               console.error("error: ", err);
-              reject(err);
+              return reject(err);
             }
           }
         );

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
-import Recipe from '../pages/Recipe';
+import Recipe from '../Components/Recipe';
 import CloseButton from 'react-bootstrap/CloseButton'
 export default function MyRecipes() {
   try {
@@ -23,10 +23,10 @@ export default function MyRecipes() {
           headers: { 'Content-Type': 'application/json' },
         }).then(async (res) => {
           if (res.ok) {
-            res = await res.json();
-            console.log(res);
-            if (Array.isArray(res))
-              setResponse(res);
+            let data = await res.json();
+            console.log(data);
+            if (Array.isArray(data))
+              setResponse(data);
             else {
               userHasNone(true);
             }

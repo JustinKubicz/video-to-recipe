@@ -2,11 +2,12 @@ import express, { json, urlencoded } from "express";
 import cors from "cors";
 import VideoDownloader from "./src/videoDownloader.js";
 import TranscriptGrabber from "./src/transcriptGrabber.js";
-import { execFile } from "child_process";
+
 import fs from "fs";
 import userAuthenticator from "./src/userAuthenticator.js";
 import jwt from "jsonwebtoken";
 import MyPool from "./config/db.js";
+import generateParse from "./src/geminiParser.js";
 const app = express();
 const pool = new MyPool();
 /*
@@ -25,39 +26,7 @@ const port = 5000;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
-async function parseIngredientsWithPython(transcript, id) {
-  return new Promise((resolve, reject) => {
-    if (!fs.existsSync("./outputFiles/parseFiles/parse-" + id + ".json")) {
-      execFile(
-        "python",
-        ["src/geminiParser.py", transcript, id],
-        (error, stdout, stderr) => {
-          if (error) {
-            console.error("Error calling Python script:", error);
-          }
-          if (stderr) {
-            console.error("Standard error from Python script:", stderr);
-          }
-          if (stdout) {
-            console.log("Python complete.");
-          }
-          if (fs.existsSync("./outputFiles/parseFiles/parse-" + id + ".json")) {
-            resolve("./outputFiles/parseFiles/parse-" + id + ".json");
-          } else {
-            reject("failed to create parse file.");
-          }
-        }
-      );
-    } else {
-      console.log(
-        "./outputFiles/parseFiles/parse-" +
-          id +
-          ".json already exists, retrieving"
-      );
-      resolve("./outputFiles/parseFiles/parse-" + id + ".json");
-    }
-  });
-}
+
 async function startGeneration(aUrl) {
   if (aUrl.includes("shorts")) {
     //if yt shorts, convert to watch url and proceed like normal yt
@@ -80,7 +49,7 @@ async function readJSON(aFilePath) {
         jsonData = JSON.parse(data);
         resolve(jsonData);
       } else if (error) {
-        console.error("error: ", error);
+        console.error("error: readJSON", error);
         reject(error);
       }
     });
@@ -92,13 +61,10 @@ app.post("/api/generate", async (req, res) => {
     const { url } = req.body;
     console.log("POST RECEIVED: ", url);
     const videoPath = await startGeneration(url);
-
+    let videoId = downloader.decipherYTVideoID(url);
     const transcript = await transcriptor.generateTranscript(videoPath);
 
-    await parseIngredientsWithPython(
-      transcript,
-      downloader.decipherYTVideoID(url)
-    ).then(async (data) => {
+    await generateParse(transcript, videoId).then(async (data) => {
       await readJSON(data).then(async (data2) => {
         let vidId = await downloader.decipherYTVideoID(url);
         //if data2 changes here, it must change in recipe.jsx
@@ -154,7 +120,7 @@ app.post("/api/login", async (req, res) => {
       res.status(500).send("Bad Password");
     }
   } catch (error) {
-    console.error("error: ", error);
+    console.error("error: /login ", error);
     res.status(500).send(error);
   }
 });
@@ -192,8 +158,8 @@ app.get("/api/buildMyRecipes", async (req, res) => {
           .query(`SELECT videoid FROM user_recipes WHERE userId = '${user}';`)
           .then(async (data) => {
             let size = data.rows.length;
-            let result = [size];
-            for (let i = 0; i < data.rows.length; i++) {
+            let result = [];
+            for (let i = 0; i < size; i++) {
               result[i] = data.rows[i].videoid;
               console.log(`USER ${email} saved recipe found: ${result[i]}`);
             }
@@ -207,7 +173,9 @@ app.get("/api/buildMyRecipes", async (req, res) => {
               }
               res.status(200).json(result);
             } else {
-              res.status(200).send(`'${email}': User has no recipes`);
+              res
+                .status(200)
+                .json({ messsage: `'${email}': User has no recipes` });
             }
           });
       });

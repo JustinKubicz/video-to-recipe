@@ -2,7 +2,7 @@ import { useState } from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import Recipe from '../pages/Recipe';
+import Recipe from '../Components/Recipe';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 
 export default function Home() {

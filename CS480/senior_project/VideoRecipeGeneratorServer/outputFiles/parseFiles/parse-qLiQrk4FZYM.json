@@ -1,0 +1,29 @@
+{
+  "name": "Chicken and Sausage Jambalaya",
+  "ingredients": [
+    {"ingredient": "Andouille sausage", "amount": "BLANK"},
+    {"ingredient": "Chicken thighs", "amount": "BLANK"},
+    {"ingredient": "All-purpose seasoning", "amount": "BLANK"},
+    {"ingredient": "Bell peppers", "amount": "BLANK"},
+    {"ingredient": "Onions", "amount": "BLANK"},
+    {"ingredient": "Celery", "amount": "BLANK"},
+    {"ingredient": "Garlic", "amount": "BLANK"},
+    {"ingredient": "Tomato paste", "amount": "BLANK"},
+    {"ingredient": "Crushed tomatoes", "amount": "BLANK"},
+    {"ingredient": "Rice", "amount": "1/2 cup"},
+    {"ingredient": "Chicken broth", "amount": "BLANK"},
+    {"ingredient": "Green onions", "amount": "BLANK"}
+  ],
+  "instructions": [
+    "Cook andouille sausage until brown; set aside.",
+    "In the same skillet, cook seasoned chicken thighs until lightly browned; remove and set aside.",
+    "Reduce heat to medium; sauté bell peppers, onions, and celery (the holy trinity).",
+    "Add garlic, tomato paste, and crushed tomatoes.",
+    "Stir in rice, cooked sausage, and chicken.",
+    "Add chicken broth; season well.",
+    "Bring to a boil, then reduce heat to low and simmer for 12 minutes.",
+    "Turn off heat and let the jambalaya fluff.",
+    "Garnish with green onions and serve hot."
+  ]
+}
+
