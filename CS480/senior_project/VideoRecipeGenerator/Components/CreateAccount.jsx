@@ -43,18 +43,24 @@ export default function Create() {
 
                 if (/[A-Z]/.test(formData.password)) {
                     requirements[0].character = '✔';
+
                 } else {
                     requirements[0].character = '⊗';
+
                 }
                 if (/[0-9]/.test(formData.password) && /[^a-zA-z0-9]/.test(formData.password)) {
                     requirements[1].character = '✔';
+
                 } else {
                     requirements[1].character = '⊗';
+
                 }
                 if (formData.password.length >= 8) {
                     requirements[2].character = '✔';
+
                 } else {
                     requirements[2].character = '⊗';
+
                 }
                 let met = 0;
                 let ans = "Password Requirements\n";
@@ -74,6 +80,11 @@ export default function Create() {
                 }
                 setPassMessage(ans);
 
+            } else {
+                for (let i = 0; i < requirements.length; i++) {
+                    requirements[i].character == '⊗';
+                }
+                passRequirementsMet(false);
             }
         }, [formData.password]
     )
@@ -82,24 +93,33 @@ export default function Create() {
         <Form onSubmit={onSubmit}>
             <Form.Group className="mb-3" controlId="Main">
                 <Form.Label>Please Provide A Valid Email:</Form.Label>
-                <Form.Control placeholder="Email" value={formData.email} onChange={event => setFormData({ ...formData, email: event.target.value })} ></Form.Control>
+                <Form.Control placeholder="Email" value={formData.email} onChange={(event) => setFormData({ ...formData, email: event.target.value })} ></Form.Control>
                 <Form.Text className="text-muted">
                     Please Enter Email.
                 </Form.Text>
             </Form.Group>
             <Form.Group className="mb-3" controlId="Main">
                 <Form.Label>Choose a Unique Password:</Form.Label>
-                <Form.Control placeholder="Password" value={formData.password} onChange={event => {
-                    setFormData({ ...formData, password: event.target.value });
-
+                <Form.Control placeholder="Password" value={formData.password} onChange={(event) => {
+                    if (event.target.value) { setFormData({ ...formData, password: event.target.value }); }
+                    else {
+                        setFormData({ ...formData, password: "" });
+                        setPassMessage("Please Enter Password");
+                    }
                 }} />
                 <Form.Text className="text-muted">
                     {passwordMessage}
                 </Form.Text>
             </Form.Group>
-            {accountCreated ? <Link to="/SignIn">Account Created, Please Sign In, Click Here</Link> : <Button variant="primary" type="submit">
-                Sign-Up
-            </Button>}
+            {accountCreated ?
+                (<Link to="/SignIn">Account Created, Please Sign In, Click Here</Link>) :
+                (arePassRequirementsMet ?
+                    <Button variant="primary" type="submit">
+                        Sign-Up
+                    </Button> :
+                    <Button variant="primary" type="submit" disabled>
+                        Sign-Up
+                    </Button>)}
         </Form >
     )
 }
