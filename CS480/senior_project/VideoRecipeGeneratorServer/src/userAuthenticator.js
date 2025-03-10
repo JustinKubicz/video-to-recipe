@@ -9,22 +9,23 @@ class userAuthenticator {
 
   async createUser(email, password) {
     try {
-      const salt = await bcrypt.genSalt();
-      const hashedPassword = await bcrypt.hash(password, salt);
-      console.log(salt);
-      console.log(hashedPassword);
-      pool.myPool.query(`INSERT INTO Users (Email,Password) VALUES($1,$2);`, [
-        email,
-        hashedPassword,
-      ]);
+      if (!(await this.userAlreadyExists(email))) {
+        const salt = await bcrypt.genSalt();
+        const hashedPassword = await bcrypt.hash(password, salt);
+        await pool.myPool.query(
+          `INSERT INTO Users (Email,Password) VALUES($1,$2);`,
+          [email, hashedPassword]
+        );
 
-      return 200;
+        return 200;
+      } else {
+        return 409; //Conflict, user already exists
+      }
     } catch (error) {
       console.error("error: userAuthenticator.js", error);
       return error;
     }
   }
-
   async loginUser(email, password) {
     try {
       const result = await pool.myPool.query(
@@ -33,9 +34,9 @@ class userAuthenticator {
       );
 
       const user = result.rows[0];
+      if (!user) return 404;
       console.log(user.email);
       console.log(user.password);
-      if (!user) return 400;
 
       const match = await bcrypt.compare(password, user.password);
 
@@ -47,6 +48,23 @@ class userAuthenticator {
     } catch (error) {
       console.error("error: userAuthenticator.js", error);
       return error;
+    }
+  }
+  async userAlreadyExists(anEmail) {
+    //TEST THIS!
+    try {
+      let response = await pool.myPool.query(
+        `SELECT FROM USERS WHERE email = $1;`,
+        [anEmail]
+      );
+      if (response.rows[0]) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error("error: userAuthenticator.js", error);
+      return false;
     }
   }
 }

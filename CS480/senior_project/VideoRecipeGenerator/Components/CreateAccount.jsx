@@ -1,7 +1,6 @@
-import { Form, Button } from "react-bootstrap";
-import axios from 'axios'
+import { Form, Button, ToggleButton } from "react-bootstrap";
 import { useEffect, useState } from 'react';
-import { resolveComponent } from "vue";
+
 import { Link } from "react-router-dom";
 export default function Create() {
 
@@ -9,6 +8,8 @@ export default function Create() {
     const [accountCreated, updateAccountCreate] = useState(false);
     const [passwordMessage, setPassMessage] = useState("Please Enter Password");
     const [arePassRequirementsMet, passRequirementsMet] = useState(false);
+    const [passIsVisible, setPassVisibility] = useState(false);
+    const [emailMessage, setEmailMessage] = useState("Please Enter a Valid Email Address");
     let requirements =
         [
             {
@@ -27,14 +28,23 @@ export default function Create() {
 
     const onSubmit = (event) => {
         event.preventDefault();
-        axios.post('http://localhost:5000/api/users', formData).then((res) => {
-            if (res) {
+        fetch('http://localhost:5000/api/users', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        }).then(async (res) => {
+            if (res.ok) {
                 console.log("user created: ", res);
                 updateAccountCreate(true);
 
+            } else if (res.status == 409) {
+                setEmailMessage("An Account Already Exists With That Email")
             } else {
-                console.error(res.status);
+                let message = await res.text();
+                throw new Error(res.status + ": " + message);
             }
+        }).catch((error) => {
+            console.error(error.message);
         })
     }
     useEffect(
@@ -95,31 +105,65 @@ export default function Create() {
                 <Form.Label>Please Provide A Valid Email:</Form.Label>
                 <Form.Control placeholder="Email" value={formData.email} onChange={(event) => setFormData({ ...formData, email: event.target.value })} ></Form.Control>
                 <Form.Text className="text-muted">
-                    Please Enter Email.
+                    {emailMessage}
                 </Form.Text>
             </Form.Group>
             <Form.Group className="mb-3" controlId="Main">
                 <Form.Label>Choose a Unique Password:</Form.Label>
-                <Form.Control placeholder="Password" value={formData.password} onChange={(event) => {
-                    if (event.target.value) { setFormData({ ...formData, password: event.target.value }); }
-                    else {
-                        setFormData({ ...formData, password: "" });
-                        setPassMessage("Please Enter Password");
-                    }
-                }} />
+                {passIsVisible ?
+                    <Form.Control placeholder="password" value={formData.password} onChange={(event) => {
+                        if (event.target.value) {
+                            setFormData({ ...formData, password: event.target.value });
+                        }
+                        else {
+                            setFormData({ ...formData, password: "" });
+                            setPassMessage("Please Enter Password");
+                        }
+                    }} /> :
+                    <Form.Control placeholder="password" type="Password" value={formData.password} onChange={(event) => {
+                        if (event.target.value) {
+                            setFormData({ ...formData, password: event.target.value });
+                        }
+                        else {
+                            setFormData({ ...formData, password: "" });
+                            setPassMessage("Please Enter Password");
+                        }
+                    }} />}
                 <Form.Text className="text-muted">
                     {passwordMessage}
                 </Form.Text>
+
             </Form.Group>
+
             {accountCreated ?
-                (<Link to="/SignIn">Account Created, Please Sign In, Click Here</Link>) :
+                <Link to="/SignIn">Account Created, Please Sign In, Click Here</Link> :
                 (arePassRequirementsMet ?
-                    <Button variant="primary" type="submit">
-                        Sign-Up
-                    </Button> :
-                    <Button variant="primary" type="submit" disabled>
-                        Sign-Up
-                    </Button>)}
+                    <div>
+                        <Button variant="primary" type="submit">
+                            Sign-Up
+                        </Button> <ToggleButton
+                            id="showPass"
+                            type="checkbox"
+                            variant="outline-secondary"
+                            value="1"
+                            checked={passIsVisible}
+                            onChange={(event) => {
+                                setPassVisibility(!passIsVisible);
+                            }}>Show Password</ToggleButton>
+                    </div> :
+                    <div>
+                        <Button variant="primary" type="submit" disabled>
+                            Sign-Up
+                        </Button> <ToggleButton
+                            id="showPass"
+                            type="checkbox"
+                            variant="outline-secondary"
+                            value={1}
+                            checked={passIsVisible}
+                            onChange={(event) => {
+                                setPassVisibility(!passIsVisible);
+                            }}>Show Password</ToggleButton>
+                    </div>)}
         </Form >
     )
 }

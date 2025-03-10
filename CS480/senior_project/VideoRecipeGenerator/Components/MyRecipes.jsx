@@ -1,4 +1,4 @@
-import useIsAuthenticated from 'react-auth-kit/hooks/useIsAuthenticated';
+
 import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
@@ -11,9 +11,8 @@ export default function MyRecipes() {
     const [selected, updateSelection] = useState(false);
     const [selectedRecipe, setRecipe] = useState({});
     const [userHasNoRecipesSaved, userHasNone] = useState(false);
-    const [DESTROY, itemDeleted] = useState(false);
     const user = useAuthUser();
-    const nav = useNavigate();
+
     const [response, setResponse] = useState([]);
     useEffect(() => {
       async function grabRecipes() {
@@ -44,7 +43,8 @@ export default function MyRecipes() {
       //delete function
       // 1. make delete fetch()
       console.log(`Deleting ${anItem.videoId} from account: ${user.name}`)
-      await fetch(`http://localhost:5000/api/delete?email=${user.name}&id=${anItem.videoId}`, {
+      let id = encodeURIComponent(anItem.videoId);
+      await fetch(`http://localhost:5000/api/delete?email=${user.name}&id=${id}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
       })
@@ -53,8 +53,14 @@ export default function MyRecipes() {
         .then(
           async (res) => {
             if (res.ok) {
-              if (response.length == 1) userHasNone(true); //if after deletion, there was only 1, just set userHasNone to true and the card will go away
-              else setResponse(response.splice(anIndex)); //else splice the cards and they'll rerender
+              if (response.length == 1) {
+                userHasNone(true);
+              }//if after deletion, there was only 1, just set userHasNone to true and the card will go away
+              else {
+                let temp = [...response];
+                temp.splice(anIndex, 1);
+                setResponse(temp);
+              }//else splice the cards and they'll rerender
             } else {
               console.error("error del function in MyRecipes: ", res.status);
             }
@@ -81,7 +87,7 @@ export default function MyRecipes() {
                         }}>View</Button>
                         <Button variant="secondary" onClick={async () => {
                           await del(item, index);
-                          itemDeleted(!DESTROY);//should just trigger a rerender of the cards after a deletion
+
                         }}>Delete</Button>
                       </Card.Body>
                     </Card>
@@ -95,7 +101,7 @@ export default function MyRecipes() {
       else {
         return (
           <div id="main">
-            <Recipe toRender={selectedRecipe} isAlreadySaved={true}>
+            <Recipe toRender={selectedRecipe} isAlreadySaved={true} recipeId={selectedRecipe.videoId}>
             </Recipe>
             <CloseButton id="close" onClick={() => updateSelection(false)}></CloseButton>
             <style>{`

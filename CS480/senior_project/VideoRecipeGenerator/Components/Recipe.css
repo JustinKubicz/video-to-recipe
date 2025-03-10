@@ -1,0 +1,15 @@
+/*https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_media_queries/Printing*/
+@media print {
+    body  {
+        visibility: hidden;
+    }
+    .printable {
+        visibility: visible;
+    }
+    .printable {
+        position: relative;
+        left: 0;
+        top: -200px;
+        
+    }
+}

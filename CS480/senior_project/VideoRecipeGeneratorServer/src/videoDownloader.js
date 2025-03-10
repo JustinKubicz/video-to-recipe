@@ -29,42 +29,40 @@ class VideoDownloader {
       console.log("DOWNLOADING: ", aUrl);
 
       const outputDir = "./outputFiles/videoFiles/";
-      const outputFilePath = outputDir + id + ".webm";
-      if (!existsSync(outputFilePath)) {
-        pkg
-          .download(aUrl, {
-            filter: "mergevideo",
-            quality: "480p",
-            format: "webm",
-            embedSubs: true,
-            output: {
-              fileName: id + ".webm",
-              outDir: outputDir,
-            },
-          })
-          .on("progress", (data) => {
-            let prog = data.downloaded / data.total;
-            bar.update(prog);
-          })
-          .on("finished", () => {
-            console.log("\nFINISHED DOWNLOADING: " + outputFilePath);
-            if (existsSync(outputFilePath)) {
-              let newOutputFilePath = outputFilePath.replace(/\\/g, "/");
-              console.log(newOutputFilePath);
-              resolve(newOutputFilePath);
-            } else {
-              reject("failed to find video file after download");
-            }
-          })
-          .on("error", (e) => {
-            console.error(e);
-            reject(e);
-          });
-      } else {
-        console.log("data should exist already, retrieving: ");
-        let newOutputFilePath = outputFilePath.replace(/\\/g, "/");
-        resolve(newOutputFilePath);
+      const outputFilePath = outputDir + id + ".mp3";
+      if (existsSync(outputFilePath)) {
+        console.log(
+          "videoDownloader.js: File Exists Already, resolving with that"
+        );
+        return resolve(outputFilePath);
       }
+      pkg
+        .download(aUrl, {
+          filter: "audioonly",
+          format: "mp3",
+          output: {
+            fileName: id + ".mp3",
+            outDir: outputDir,
+          },
+        })
+        .on("progress", (data) => {
+          let prog = data.downloaded / data.total;
+          bar.update(prog);
+        })
+        .on("finished", () => {
+          console.log("\nFINISHED DOWNLOADING: " + outputFilePath);
+          if (existsSync(outputFilePath)) {
+            let newOutputFilePath = outputFilePath.replace(/\\/g, "/");
+            console.log(newOutputFilePath);
+            resolve(newOutputFilePath);
+          } else {
+            reject("failed to find audio file after download");
+          }
+        })
+        .on("error", (e) => {
+          console.error("videoDownloader.js" + e);
+          reject(e);
+        });
     });
   }
 }

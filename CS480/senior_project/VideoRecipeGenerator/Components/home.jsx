@@ -1,20 +1,21 @@
 import { useState } from 'react'
-import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import Recipe from '../Components/Recipe';
+import Recipe from './Recipe';
 import ProgressBar from 'react-bootstrap/ProgressBar';
-
 export default function Home() {
-  const [formSubmitted, triggerProgressBar] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [newURL, setNewURL] = useState("");
   const [recipe, setRecipe] = useState(null);
   const [progress, setProgress] = useState(0);
   const [recipeId, setRecipeId] = useState("");
-
+  let mainFormLabel = "Your Next Masterpiece: ";
+  let mainFormPlaceHolder = "Paste Youtube or TikTok URL Here...";
+  let mainFormText = "Works with valid Youtube and TikTok URLs";
+  let submitButtonText = "Create Recipe 🍽";
   async function sleep() {
     return new Promise(resolve => {
-      setTimeout(resolve, 150);
+      setTimeout(resolve, 75);
     })
   }
   async function animateProgressBar(start, end) {
@@ -26,8 +27,8 @@ export default function Home() {
   }
 
   async function handleSub(event) {
-    triggerProgressBar(true);
-    animateProgressBar(0, 100);
+    setIsLoading(true);
+    animateProgressBar(0, 75);
     event.preventDefault();
     try {
       const response = await fetch('http://localhost:5000/api/generate', {
@@ -36,15 +37,16 @@ export default function Home() {
         body: JSON.stringify({ url: newURL })
       }
       );
-      console.log("POST Sent for: ", newURL);
+      await animateProgressBar(75, 85);
+      console.log("home.jsx: POST Sent for: ", newURL);
       let data = await response.json();
       //setRecipe(data.recipe);
-      console.log('here is data: ', data);
-      console.log(data.data);
-      console.log(data.id);
+      console.log('home.jsx: here is data: ', data);
+      console.log('home.jsx:', data.data);
+      console.log('home.jsx:', data.id);
       setRecipeId(data.id);
-      setProgress(100);
-      triggerProgressBar(false);
+      await animateProgressBar(85, 100);
+      setIsLoading(false);
       setRecipe(data.data);
     } catch (error) {
       console.error('Error processing video:', error);
@@ -55,19 +57,19 @@ export default function Home() {
     <>
       <Form onSubmit={handleSub}>
         <Form.Group className="mb-3" controlId="Main">
-          <Form.Label>Your Next Masterpiece:</Form.Label>
-          <Form.Control placeholder="Paste YouTube URL here." value={newURL} onChange={event => setNewURL(event.target.value)} ></Form.Control>
+          <Form.Label>{mainFormLabel}</Form.Label>
+          <Form.Control placeholder={mainFormPlaceHolder} value={newURL} onChange={event => setNewURL(event.target.value)} ></Form.Control>
           <Form.Text className="text-muted">
-            Only works with valid YouTube or YouTube Shorts URLs, TikTok support coming soon...
+            {mainFormText}
           </Form.Text>
         </Form.Group>
         <Button variant="primary" type="submit">
-          Create Recipe 🍽
+          {submitButtonText}
         </Button><br />
-        {formSubmitted && <ProgressBar striped animated now={progress} />}
-        <Recipe toRender={recipe} recipeId={recipeId} />
-      </Form >
 
+      </Form >
+      {isLoading ? <ProgressBar striped animated now={progress} /> :
+        <Recipe toRender={recipe} recipeId={recipeId} isAlreadySaved={false} />}
 
     </>
   )
