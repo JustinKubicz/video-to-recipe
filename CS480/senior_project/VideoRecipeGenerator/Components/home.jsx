@@ -15,7 +15,7 @@ export default function Home() {
   let submitButtonText = "Create Recipe 🍽";
   async function sleep() {
     return new Promise(resolve => {
-      setTimeout(resolve, 75);
+      setTimeout(resolve, 100);
     })
   }
   async function animateProgressBar(start, end) {
