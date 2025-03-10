@@ -40,6 +40,7 @@ export default function Home() {
       await animateProgressBar(75, 85);
       console.log("home.jsx: POST Sent for: ", newURL);
       let data = await response.json();
+      if (!data.ok) throw new Error(data.status + " " + data.error)
       //setRecipe(data.recipe);
       console.log('home.jsx: here is data: ', data);
       console.log('home.jsx:', data.data);
