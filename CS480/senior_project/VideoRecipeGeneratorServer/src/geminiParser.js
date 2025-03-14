@@ -7,9 +7,7 @@ import fs from "fs";
 class GeminiParser {
   constructor() {
     try {
-      this.genAI = new GoogleGenerativeAI(
-        "AIzaSyDdxnxeMtA9yJgktnolLyqBzTgUUMOlpgQ"
-      ); //need to hide this key
+      this.genAI = new GoogleGenerativeAI(process.env.GOOGLE_KEY); //
       this.model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     } catch (error) {
       console.error(error);

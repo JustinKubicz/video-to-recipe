@@ -2,13 +2,10 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { GoogleAIFileManager, FileState } from "@google/generative-ai/server";
 import fs from "fs";
-import { existsSync, createReadStream, createWriteStream, readFile } from "fs";
 
 class TranscriptGrabber {
   constructor() {
-    this.genAI = new GoogleGenerativeAI(
-      "AIzaSyDdxnxeMtA9yJgktnolLyqBzTgUUMOlpgQ"
-    ); //need to hide this
+    this.genAI = new GoogleGenerativeAI(process.env.GOOGLE_KEY);
     this.model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
   }
 
@@ -35,9 +32,7 @@ class TranscriptGrabber {
         );
         if (fs.existsSync(aFilePath)) {
           try {
-            let fileManager = new GoogleAIFileManager(
-              "AIzaSyDdxnxeMtA9yJgktnolLyqBzTgUUMOlpgQ"
-            );
+            let fileManager = new GoogleAIFileManager(process.env.GOOGLE_KEY);
 
             let uploadResult = await fileManager.uploadFile(aFilePath, {
               mimeType: "audio/mp3",
