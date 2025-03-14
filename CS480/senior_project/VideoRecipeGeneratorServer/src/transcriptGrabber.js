@@ -1,5 +1,3 @@
-import { OpenAI } from "openai";
-import ffmpeg from "fluent-ffmpeg"; //https://www.npmjs.com/package/fluent-ffmpeg
 //https://ai.google.dev/gemini-api/docs/audio?lang=node
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { GoogleAIFileManager, FileState } from "@google/generative-ai/server";

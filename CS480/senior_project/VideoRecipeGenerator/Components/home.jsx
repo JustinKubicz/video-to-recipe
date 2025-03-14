@@ -37,16 +37,17 @@ export default function Home() {
         body: JSON.stringify({ url: newURL })
       }
       );
-      await animateProgressBar(75, 85);
+      if (!response.ok) throw new Error(data.status + " " + data.error)
+      animateProgressBar(75, 99);
       console.log("home.jsx: POST Sent for: ", newURL);
       let data = await response.json();
-      if (!data.ok) throw new Error(data.status + " " + data.error)
+
       //setRecipe(data.recipe);
       console.log('home.jsx: here is data: ', data);
       console.log('home.jsx:', data.data);
       console.log('home.jsx:', data.id);
       setRecipeId(data.id);
-      await animateProgressBar(85, 100);
+      animateProgressBar(99, 100);
       setIsLoading(false);
       setRecipe(data.data);
     } catch (error) {

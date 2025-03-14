@@ -8,8 +8,6 @@ import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 import { useEffect, useState } from "react";
 export default function MyNavbar() {
     const isAuthenticated = useIsAuthenticated();
-    //I didn't know this at decision time, but React-Auth-Kit has an issue with useIsAuthenticated hook, can be found here:: https://github.com/react-auth-kit/react-auth-kit/issues/1541
-    //But basically, I'm forced to manually refresh the page upon sign in and sign out until the issue is fixed or I find a new Auth library.
     const auth = useAuthUser();
     const [navName, updateNav] = useState("Welcome!");
     const [path, setPath] = useState("/SignIn");
@@ -30,7 +28,7 @@ export default function MyNavbar() {
             setPath2("/CreateAccount");
             setMessage2("Create Account");
         }
-    }, [isAuthenticated, auth])
+    }, [isAuthenticated])
 
 
 

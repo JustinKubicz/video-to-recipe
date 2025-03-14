@@ -5,7 +5,6 @@ import SignIn from '../Components/SignIn.jsx';
 import MyRecipes from '../Components/MyRecipes';
 import Home from '../Components/Home';
 import { Route, Routes } from "react-router-dom";
-import RequireAuth from "react-auth-kit";
 import Create from "../Components/CreateAccount.jsx";
 import SignOut from '../Components/SignOut.jsx';
 

@@ -5,7 +5,7 @@ import path from "path";
 class TikTokDownloader {
   //TikTokDownloader utilizes yt-dlp's CLI tool and the nodejs exec function to execute the download.
   //I vastly prefer this approach to how I used yt-dlp in the youtube downloader. However I did write that code months prior to this code
-  //and was unaware I could do it this way, the youtube downloader utilizes a yt-dlp Node wrapper package instead of just the CLI directly which is only marginally more complicated I feel like.
+  //and was unaware I could do it this way, the youtube downloader (VideoDownloader) utilizes a yt-dlp Node wrapper package instead of just the CLI directly which is only marginally more complicated I feel like.
   //especially now that I understand promises better after this project
 
   constructor() {}

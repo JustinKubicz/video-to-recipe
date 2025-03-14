@@ -38,14 +38,16 @@ async function startGeneration(aUrl) {
     //if yt shorts, convert to watch url and proceed like normal yt
     let modifiedUrl = aUrl.replace("shorts/", "watch?v=");
     console.log("converted shorts url to: ", modifiedUrl);
-    return await ytDownloader.downloadVideo(modifiedUrl);
+    let path = await ytDownloader.downloadVideo(modifiedUrl);
+    return path;
   } else if (aUrl.includes("tiktok")) {
     //if tiktok
-    return await ttDownloader.downloadTikTok(aUrl);
-    //coming soon...
+    let path = await ttDownloader.downloadTikTok(aUrl);
+    return path;
   } else {
     //regular youtube video
-    return await ytDownloader.downloadVideo(aUrl);
+    let path = await ytDownloader.downloadVideo(aUrl);
+    return path;
   }
 }
 async function readJSON(aFilePath) {
@@ -65,7 +67,6 @@ async function readJSON(aFilePath) {
 
 app.post("/api/generate", async (req, res) => {
   try {
-    const event = new Event("progress");
     const { url } = req.body;
     console.log("POST RECEIVED: ", url);
     const videoPath = await startGeneration(url);

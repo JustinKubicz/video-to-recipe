@@ -7,8 +7,6 @@ import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 import EditRecipe from './EditRecipe';
 export default function Recipe(props) {
     const { recipeId, toRender, isAlreadySaved } = props;
-    console.log("currentRecipeID: ", recipeId);
-    console.log("current recipe: ", toRender);
     const [isSaved, updateSaved] = useState(isAlreadySaved);
     const [id, updateRecipeId] = useState(recipeId);
     const isAuthenticated = useIsAuthenticated();
@@ -38,9 +36,10 @@ export default function Recipe(props) {
         } else {
             return (
 
-                <body>
+                <>
 
-                    <h2 class="printable">{toRender.name}</h2>
+                    <h2 className="printable" id='name'>{toRender.name}</h2>
+
                     <Button variant='secondary' type='button' onClick={handlePrinting}>Print This</Button>
 
                     <Button variant='secondary' type='button' onClick={() => toggleEditMode(true)}>Edit Recipe</Button>
@@ -48,24 +47,28 @@ export default function Recipe(props) {
                     {isAuthenticated ?
                         (isSaved || isAlreadySaved ? <p>Saved to My Recipes</p> : <Button variant='secondary' type='button' onClick={SaveToMyRecipes}>Save To My Recipes</Button>)
                         : null}
-                    <div class="printable">
-                        <h3>Ingredients:</h3>
+                    <main className="gridContainer printable">
+                        <div className="Ing">
+                            <h3>Ingredients:</h3>
 
-                        <ul>
-                            {toRender.ingredients.map((ingredient, index) => {
-                                return (<li key={index} >{ingredient.ingredient} : {ingredient.amount}</li>)
-                            })}
-                        </ul>
-                        <h3>Instructions: </h3>
-                        <ul>
-                            {
-                                toRender.instructions.map((instruction, index) => {
-                                    return (<li key={index}>{instruction.instruction}</li>)
-                                })
-                            }
-                        </ul>
-                    </div>
-                </body>
+                            <ul>
+                                {toRender.ingredients.map((ingredient, index) => {
+                                    return (<li key={index} >{ingredient.ingredient} : {ingredient.amount}</li>)
+                                })}
+                            </ul>
+                        </div>
+                        <div className="Ins">
+                            <h3>Instructions: </h3>
+                            <ul>
+                                {
+                                    toRender.instructions.map((instruction, index) => {
+                                        return (<li key={index}>{instruction.instruction}</li>)
+                                    })
+                                }
+                            </ul>
+                        </div>
+                    </main>
+                </>
             )
         }
     } else {

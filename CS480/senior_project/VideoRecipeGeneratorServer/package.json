@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon --inspect  server.js",
-    "dev": "nodemon server"
+    "dev": "nodemon server",
+    "postinstall": "node config/check-yt-dlp.js"
   },
   "author": "Justin Kubicz",
   "license": "ISC",
@@ -20,12 +21,10 @@
     "fluent-ffmpeg": "^2.1.3",
     "https": "^1.0.0",
     "jsonwebtoken": "^9.0.2",
-    "openai": "^4.73.1",
     "pg": "^8.13.1",
     "progress": "^2.0.3",
     "proxy": "^2.2.0",
     "readline": "^1.3.0",
-    "youtube-transcript": "^1.2.1",
     "ytdlp-nodejs": "^0.1.5"
   },
   "devDependencies": {

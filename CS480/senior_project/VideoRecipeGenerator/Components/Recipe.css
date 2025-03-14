@@ -3,13 +3,31 @@
     body  {
         visibility: hidden;
     }
+    #name{
+        text-align: center;
+    }
     .printable {
         visibility: visible;
     }
     .printable {
         position: relative;
         left: 0;
-        top: -200px;
-        
+        top:  -175px;
     }
+    .gridContainer {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 20px;
+
+    }
+    .ing{
+        grid-column: 1 / span 1;
+        text-align: left;
+    }
+   
+    .ins{
+        grid-column: 2 / span 1;
+        text-align: right;
+    }
+  
 }
