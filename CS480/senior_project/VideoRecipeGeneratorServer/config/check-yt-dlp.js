@@ -1,5 +1,5 @@
 import { execSync, exec } from "child_process";
-
+//https://nodejs.org/api/child_process.html#child_processexecsynccommand-options
 exec("yt-dlp --version", (error, stdout) => {
   if (error) {
     console.log("installing yt-dlp cli dependency");
