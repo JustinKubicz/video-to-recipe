@@ -21,9 +21,12 @@ TODO:
   THERE'S NO REASON TO CLEAN PARSE FILES UNLIKE THERE IS NEED TO CLEAN VIDEO FILES
 
 */
+//MIDDLEWARE
 app.use(cors());
 app.use(json());
 app.use(urlencoded({ extended: true }));
+
+//INTERNALS
 const transcriptor = new TranscriptGrabber();
 const ytDownloader = new VideoDownloader();
 const parser = new GeminiParser();
@@ -33,49 +36,22 @@ app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
 
-async function startGeneration(aUrl) {
-  if (aUrl.includes("shorts")) {
-    //if yt shorts, convert to watch url and proceed like normal yt
-    let modifiedUrl = aUrl.replace("shorts/", "watch?v=");
-    console.log("converted shorts url to: ", modifiedUrl);
-    let path = await ytDownloader.downloadVideo(modifiedUrl);
-    return path;
-  } else if (aUrl.includes("tiktok")) {
-    //if tiktok
-    let path = await ttDownloader.downloadTikTok(aUrl);
-    return path;
-  } else {
-    //regular youtube video
-    let path = await ytDownloader.downloadVideo(aUrl);
-    return path;
-  }
-}
-async function readJSON(aFilePath) {
-  return new Promise((resolve, reject) => {
-    let jsonData = "";
-    fs.readFile(aFilePath, (error, data) => {
-      if (data) {
-        jsonData = JSON.parse(data);
-        return resolve(jsonData);
-      } else if (error) {
-        console.error("error: readJSON", error);
-        return reject();
-      }
-    });
-  });
-}
-
+//ENDPOINTS
 app.post("/api/generate", async (req, res) => {
   try {
     const { url } = req.body;
+    let videoPath = checkIfParseFileExists(url);
     console.log("POST RECEIVED: ", url);
-    const videoPath = await startGeneration(url);
-    let videoId = videoPath.match(/.*\/(.+)\./);
-    const transcript = await transcriptor.generateTranscript(videoPath);
-    let data = await parser.generateParse(transcript, videoId[1]);
-    let data2 = await readJSON(data);
+    let videoId = videoPath.match(/.+\/parse-(.+)\./);
+    if (videoPath == "") {
+      videoPath = await startGeneration(url);
+      const transcript = await transcriptor.generateTranscript(videoPath);
+      videoId = videoPath.match(/.*\/(.+)\./);
+      videoPath = await parser.generateParse(transcript, videoId[1]);
+    }
+    let data = await readJSON(videoPath);
     let response = {
-      data: data2,
+      data: data,
       id: videoId[1],
     };
     let outputDir = "./outputFiles";
@@ -219,9 +195,40 @@ app.delete("/api/delete", async (req, res) => {
     res.status(500).send(error);
   }
 });
+
+app.post("/api/update", async (req, res) => {
+  try {
+    //receive updated recipe and the id and assign them to variables
+    let body = req.body;
+    let recipe = body.recipe;
+    let recipeId = body.recipeId;
+    let isAlreadySaved = body.isAlreadySaved;
+
+    //write the recipe to a new parse file, with a new unique id
+    let newId = getNewId();
+    let fp = `./outputFiles/parseFiles/parse-${newId}.txt`;
+    console.log("api/update: new file path: ", fp);
+    fs.writeFileSync(fp, JSON.stringify(recipe));
+    //find user's saved recipe (if applicable) and change the recipeId to the new id
+    if (isAlreadySaved) {
+      let resp = await pool.myPool.query(
+        "UPDATE user_recipes SET videoid=$1 WHERE videoid=$2",
+        [newId, recipeId]
+      );
+    }
+    //responsd to client with success code and new recipeid
+    res.status(201).json({
+      recipeId: newId,
+    });
+  } catch (error) {
+    console.error("api/update error: ", error);
+    res.status(500).send(error);
+  }
+});
+
+//UTILITY FUNCTIONS
 function isValidChar(aNumber) {
   //filter out special characters for getNewId
-  //I'd like to switch this to a single conditional that checks aNumber against an array if there's time
   switch (aNumber) {
     case 58:
     case 59:
@@ -257,32 +264,46 @@ function getNewId() {
     return ans;
   }
 }
-app.post("/api/update", async (req, res) => {
-  try {
-    //receive updated recipe and the id and assign them to variables
-    let body = req.body;
-    let recipe = body.recipe;
-    let recipeId = body.recipeId;
-    let isAlreadySaved = body.isAlreadySaved;
-
-    //write the recipe to a new parse file, with a new unique id
-    let newId = getNewId();
-    let fp = `./outputFiles/parseFiles/parse-${newId}.txt`;
-    console.log("api/update: new file path: ", fp);
-    fs.writeFileSync(fp, JSON.stringify(recipe));
-    //find user's saved recipe (if applicable) and change the recipeId to the new id
-    if (isAlreadySaved) {
-      let resp = await pool.myPool.query(
-        "UPDATE user_recipes SET videoid=$1 WHERE videoid=$2",
-        [newId, recipeId]
-      );
-    }
-    //responsd to client with success code and new recipeid
-    res.status(201).json({
-      recipeId: newId,
-    });
-  } catch (error) {
-    console.error("api/update error: ", error);
-    res.status(500).send(error);
+async function startGeneration(aUrl) {
+  if (aUrl.includes("shorts")) {
+    //if yt shorts, convert to watch url and proceed like normal yt
+    let modifiedUrl = aUrl.replace("shorts/", "watch?v=");
+    console.log("converted shorts url to: ", modifiedUrl);
+    let path = await ytDownloader.downloadVideo(modifiedUrl);
+    return path;
+  } else if (aUrl.includes("tiktok")) {
+    //if tiktok
+    let path = await ttDownloader.downloadTikTok(aUrl);
+    return path;
+  } else {
+    //regular youtube video
+    let path = await ytDownloader.downloadVideo(aUrl);
+    return path;
   }
-});
+}
+async function readJSON(aFilePath) {
+  return new Promise((resolve, reject) => {
+    let jsonData = "";
+    fs.readFile(aFilePath, (error, data) => {
+      if (data) {
+        jsonData = JSON.parse(data);
+        return resolve(jsonData);
+      } else if (error) {
+        console.error("error: readJSON", error);
+        return reject();
+      }
+    });
+  });
+}
+function checkIfParseFileExists(aURL) {
+  let dir = fs.readdirSync("./outputFiles/parseFiles");
+  for (let i = 0; i < dir.length; i++) {
+    let idOfFile = dir[i].match(/parse-(.+)\./);
+    if (idOfFile[1]) {
+      if (aURL.includes(idOfFile[1])) {
+        return `./outputFiles/parseFiles/${dir[i]}`;
+      }
+    }
+  }
+  return "";
+}
