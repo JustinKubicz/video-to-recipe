@@ -53,7 +53,7 @@ export default function Recipe(props) {
 
                             <ul>
                                 {toRender.ingredients.map((ingredient, index) => {
-                                    return (<li key={index} >{ingredient.ingredient} : {ingredient.amount}</li>)
+                                    return (<li key={index} >{ingredient.ingredient} : {ingredient.amount}</li>) //https://react.dev/learn/rendering-lists#why-does-react-need-keys, use of index key here should be okay because these arrays are static in size
                                 })}
                             </ul>
                         </div>

@@ -45,7 +45,7 @@ export default function SignIn() {
       } else if (res.status == 404) {
         //user not found
         setEmailMessage("No account associated with that email, please create an account.")
-      } else if (res.status == 500) {
+      } else if (res.status == 401) {
         //wrong password
         setPassMessage("Incorrect Password");
       } else {

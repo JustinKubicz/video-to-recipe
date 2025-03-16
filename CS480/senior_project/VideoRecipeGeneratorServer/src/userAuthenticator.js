@@ -43,7 +43,7 @@ class userAuthenticator {
       if (match) {
         return 200;
       } else {
-        return "password compare fail";
+        return 401;
       }
     } catch (error) {
       console.error("error: userAuthenticator.js", error);

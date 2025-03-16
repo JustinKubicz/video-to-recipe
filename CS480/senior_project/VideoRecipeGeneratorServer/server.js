@@ -122,8 +122,8 @@ app.post("/api/login", async (req, res) => {
 
       res.status(200).json({ message: "Logged In Success", token: jwToken });
     }
-    if (login == "password compare fail") {
-      res.status(500).send("Bad Password");
+    if (login == 401) {
+      res.status(401).send("Bad Password");
     }
   } catch (error) {
     console.error("error: /login ", error);
