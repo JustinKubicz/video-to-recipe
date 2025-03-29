@@ -51,7 +51,6 @@ class userAuthenticator {
     }
   }
   async userAlreadyExists(anEmail) {
-    //TEST THIS!
     try {
       let response = await pool.myPool.query(
         `SELECT FROM USERS WHERE email = $1;`,

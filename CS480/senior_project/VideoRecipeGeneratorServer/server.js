@@ -1,4 +1,4 @@
-import express, { json, urlencoded } from "express";
+import express, { json /*urlencoded*/ } from "express";
 import cors from "cors";
 import VideoDownloader from "./src/VideoDownloader.js";
 import TranscriptGrabber from "./src/TranscriptGrabber.js";
@@ -24,7 +24,7 @@ TODO:
 //MIDDLEWARE
 app.use(cors());
 app.use(json());
-app.use(urlencoded({ extended: true }));
+//app.use(urlencoded({ extended: true }));
 
 //INTERNALS
 const transcriptor = new TranscriptGrabber();
