@@ -1,4 +1,4 @@
-
+import "./MyRecipes.css";
 import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 import { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
@@ -72,11 +72,11 @@ export default function MyRecipes() {
       if (!selected) {
 
         return (
-          <div>
+          <div id="cards-container">
             {
               response.map((item, index) => {
                 return (
-                  <div key={index}>
+                  <div key={index} className="cards">
                     <Card style={{ width: '18rem' }}>
                       <Card.Body>
                         <Card.Title>{item.name}</Card.Title>

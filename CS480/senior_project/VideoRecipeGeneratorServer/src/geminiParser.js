@@ -1,14 +1,15 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import fs from "fs";
 
-//1.open transcript file and assign to variable
-//2. write ai response to file
-//3. return the path to that file
 class GeminiParser {
+  #genAI;
+  #model;
   constructor() {
     try {
-      this.genAI = new GoogleGenerativeAI(process.env.GOOGLE_KEY); //
-      this.model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      this.#genAI = new GoogleGenerativeAI(process.env.GOOGLE_KEY); //
+      this.#model = this.#genAI.getGenerativeModel({
+        model: "gemini-1.5-flash",
+      });
     } catch (error) {
       console.error(error);
     }
@@ -26,19 +27,32 @@ class GeminiParser {
         }
 
         let fileId = outputFileId;
+        let prompt = this.generatePrompt(aTranscript);
+        let result = await this.#model.generateContent(prompt);
+        fs.writeFileSync(
+          `./outputFiles/parseFiles/parse-${fileId}.txt`,
+          this.scrubLines(result.response.text())
+        );
 
-        let transcript = aTranscript;
-
-        let prompt =
-          "From the following transcript of a recipe video, generate a recipe with an ingredients section and an instructions section: ```" +
-          transcript +
-          "``` Please use the following JSON schema: " +
-          JSON.stringify({
-            name: "string",
-            ingredients: [{ ingredient: "string", amount: "string" }],
-            instructions: [{ instruction: "string" }],
-          }) +
-          `. If any information is missing, replace it with the string "BLANK". Ensure the instructions array contains objects, where each object has an instruction string without numbers, bullet points, or additional formatting.
+        let outputPath = `./outputFiles/parseFiles/parse-${fileId}.txt`;
+        return resolve(outputPath);
+      } catch (e) {
+        console.error(`geminiParser.js: ${e}`);
+        return reject(e);
+      }
+    });
+  }
+  generatePrompt(aTranscript) {
+    return (
+      "From the following transcript of a recipe video, generate a recipe with an ingredients section and an instructions section: ```" +
+      aTranscript +
+      "``` Please use the following JSON schema: " +
+      JSON.stringify({
+        name: "string",
+        ingredients: [{ ingredient: "string", amount: "string" }],
+        instructions: [{ instruction: "string" }],
+      }) +
+      `. If any information is missing, replace it with the string "BLANK". Ensure the instructions array contains objects, where each object has an instruction string without numbers, bullet points, or additional formatting.
       
             Here's an example output:
             {
@@ -53,25 +67,11 @@ class GeminiParser {
               ]
             }
             
-            Thank you!`;
-
-        let result = await this.model.generateContent(prompt);
-        fs.writeFileSync(
-          `./outputFiles/parseFiles/parse-${fileId}.txt`,
-          this.scrubLines(result.response.text())
-        );
-
-        let outputPath = `./outputFiles/parseFiles/parse-${fileId}.txt`;
-        return resolve(outputPath);
-      } catch (e) {
-        console.error(`geminiParser.js: ${e}`);
-        return reject(e);
-      }
-    });
+            Thank you!`
+    );
   }
-
   scrubLines(text) {
-    //necessary bc Gemini for some reason includes unnecessary characters in the first and last lines of its output
+    //necessary bc Gemini for some reason includes markdown backticks for generating a code block in its output
     let ans = "";
     let lines = text.split("\n");
     for (let i = 0; i < lines.length; i++) {

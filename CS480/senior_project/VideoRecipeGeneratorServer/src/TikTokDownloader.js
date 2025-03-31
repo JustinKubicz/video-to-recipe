@@ -16,24 +16,51 @@ class TikTokDownloader {
   }/%(id)s.%(ext)s" --extract-audio --audio-format "mp3"`; //-o "test video.%(ext)s" [URL] -x <- from the yt-dlp docs
   async downloadTikTok(aUrl) {
     return new Promise((resolve, reject) => {
-      exec(`yt-dlp ${this.#ytdlpOptions}  "${aUrl}"`, (err, stdout, stderr) => {
-        //https://nodejs.org/api/child_process.html#child-process
-        if (err) reject(err);
-        if (stdout) {
-          let filename = stdout.match(/\[ExtractAudio\]\sDestination:\s(.*)\n/);
-          if (filename == null)
-            reject(new Error("TikTokDownloader: unable to match filePath"));
-          if (fs.existsSync(filename[1])) {
-            filename[1] = filename[1].replace(/\\/g, "/");
-            resolve(filename[1]);
-          } else {
-            reject(
-              new Error("TikTokDownloader: unable to verify download location")
-            );
+      if (
+        fs.existsSync(
+          `./outputFiles/videoFiles/${this.extractVideoIdFromTikTokUrl(
+            aUrl
+          )}.mp3`
+        )
+      ) {
+        resolve(
+          `./outputFiles/videoFiles/${this.extractVideoIdFromTikTokUrl(
+            aUrl
+          )}.mp3`
+        );
+      } else {
+        exec(
+          `yt-dlp ${this.#ytdlpOptions}  "${aUrl}"`,
+          (err, stdout, stderr) => {
+            //https://nodejs.org/api/child_process.html#child-process
+            if (err) reject(err);
+            if (stdout) {
+              let filename = stdout.match(
+                /\[ExtractAudio\]\sDestination:\s(.*)\n/
+              );
+              if (filename == null)
+                reject(new Error("TikTokDownloader: unable to match filePath"));
+              if (fs.existsSync(filename[1])) {
+                filename[1] = filename[1].replace(/\\/g, "/");
+                resolve(filename[1]);
+              } else {
+                reject(
+                  new Error(
+                    "TikTokDownloader: unable to verify download location"
+                  )
+                );
+              }
+            }
           }
-        }
-      });
+        );
+      }
     });
+  }
+
+  extractVideoIdFromTikTokUrl(aUrl) {
+    let data = aUrl.match(/.+\/video\/(\d+)\?/);
+    if (data[1]) return data[1];
+    else throw new Error("Failed to Match TikTok ID");
   }
 }
 

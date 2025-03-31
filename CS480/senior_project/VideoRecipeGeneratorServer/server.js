@@ -1,8 +1,7 @@
-import express, { json /*urlencoded*/ } from "express";
+import express, { json } from "express";
 import cors from "cors";
 import VideoDownloader from "./src/VideoDownloader.js";
 import TranscriptGrabber from "./src/TranscriptGrabber.js";
-import path from "path";
 import fs from "fs";
 import userAuthenticator from "./src/UserAuthenticator.js";
 import jwt from "jsonwebtoken";
@@ -10,54 +9,49 @@ import MyPool from "./config/db.js";
 import GeminiParser from "./src/GeminiParser.js";
 import TikTokDownloader from "./src/TikTokDownloader.js";
 import CleanUp from "./src/cleanup.js";
-const app = express();
-const pool = new MyPool();
-/*
-DOCS:
-https://github.com/brianc/node-postgres/blob/master/docs/pages/apis/client.mdx
-EXAMPLE URL: https://www.youtube.com/shorts/Qwwm7zlpMPs
-TODO:
-  BEFORE ANY RECIPES ARE GENERATED CHECK IF A PARSE ALREADY EXISTS!
-  THERE'S NO REASON TO CLEAN PARSE FILES UNLIKE THERE IS NEED TO CLEAN VIDEO FILES
-
-*/
-//MIDDLEWARE
-app.use(cors());
-app.use(json());
-//app.use(urlencoded({ extended: true }));
 
 //INTERNALS
+const app = express();
+const pool = new MyPool();
 const transcriptor = new TranscriptGrabber();
 const ytDownloader = new VideoDownloader();
 const parser = new GeminiParser();
 const ttDownloader = new TikTokDownloader();
 const port = 5000;
+
+//MIDDLEWARE
+app.use(cors());
+app.use(json());
+
+//START SERVER
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
 
 //ENDPOINTS
 app.post("/api/generate", async (req, res) => {
+  //Takes a URL and sees if the video alreay exists in our library, then, coordinates the generation by calling on the downloader, transcriptor and parser.
   try {
     const { url } = req.body;
-    let videoPath = checkIfParseFileExists(url);
+    let videoPath = checkIfParseFileExists(url); //Check if a parse file exists already, if it doesn't this will be an empty string
     console.log("POST RECEIVED: ", url);
-    let videoId = videoPath.match(/.+\/parse-(.+)\./);
+    let videoId = videoPath.match(/.+\/parse-(.+)\./); //Isolate the videoId if the parse did exist
     if (videoPath == "") {
-      videoPath = await startGeneration(url);
+      videoPath = await startGeneration(url); //If no videoPath already exists, begin generating
       const transcript = await transcriptor.generateTranscript(videoPath);
       videoId = videoPath.match(/.*\/(.+)\./);
       videoPath = await parser.generateParse(transcript, videoId[1]);
     }
-    let data = await readJSON(videoPath);
+    let data = await readJSON(videoPath); //Put the parsed recipe into an object
     let response = {
+      //compose a response with the recipe data and the videoId
       data: data,
       id: videoId[1],
     };
     let outputDir = "./outputFiles";
     let cleaner = new CleanUp(outputDir, videoId[1]);
-    res.status(200).json(response);
-    cleaner.cleanUp();
+    res.status(200).json(response); //send response with 200 code
+    cleaner.cleanUp(); //start the cleanup
   } catch (error) {
     console.error("Error processing video:", error);
     res.status(500).send(error);
@@ -65,13 +59,14 @@ app.post("/api/generate", async (req, res) => {
 });
 
 app.post("/api/users", async (req, res) => {
+  //Takes an email and a password and forwards them to the Authenticator module, which either creates or denies the new profile
   let ua = new userAuthenticator();
   try {
-    let createUser = await ua.createUser(req.body.email, req.body.password);
+    let createUser = await ua.createUser(req.body.email, req.body.password); //send email and password to the userAuthenticator to create the user
     if (createUser == 200) {
-      res.status(200).send("User Created");
+      res.status(200).send("User Created"); //user made
     } else if (createUser == 409) {
-      res.status(409).send("User Already exists");
+      res.status(409).send("User Already exists"); //user exists already
     }
   } catch (error) {
     console.error("error: server.js: ", error);
@@ -80,13 +75,15 @@ app.post("/api/users", async (req, res) => {
 });
 
 app.post("/api/login", async (req, res) => {
+  //Takes an email and a passwword and forwards them to the Authenticator module, which verifies the password via bcrypt and denies or approves the login
   let ua = new userAuthenticator();
   try {
-    const login = await ua.loginUser(req.body.email, req.body.password);
+    const login = await ua.loginUser(req.body.email, req.body.password); //send email and password to userAuthenticator
     if (login == 404) {
       res.status(404).send(" User not found");
     }
     if (login == 200) {
+      //sign in approved by the Authenticator, supply a token that expires in 1 hour
       let jwToken = jwt.sign(
         {
           id: req.body.email,
@@ -96,7 +93,7 @@ app.post("/api/login", async (req, res) => {
         { expiresIn: "1h" }
       );
 
-      res.status(200).json({ message: "Logged In Success", token: jwToken });
+      res.status(200).json({ message: "Logged In Success", token: jwToken }); //send token to client
     }
     if (login == 401) {
       res.status(401).send("Bad Password");
@@ -108,45 +105,46 @@ app.post("/api/login", async (req, res) => {
 });
 
 app.post("/api/save", async (req, res) => {
+  //Takes an email and recipeId, saves the ID into the DB under the userID
   try {
+    //Request data, email and videoId to save
     let email = req.body.email;
     let toSave = req.body.id;
-    console.log("saving " + toSave + " to " + email);
     let data = await pool.myPool.query(
+      //Grab primary key for the user from the DB
       `SELECT UserId FROM Users WHERE Email=$1;`,
       [email]
     );
     await pool.myPool.query(
+      //Save the videoId into to the User_Recipe table with the VideoId, UserId key pair
       `INSERT INTO User_Recipes(VideoID, UserId) VALUES  ($1, $2)`,
       [toSave, data.rows[0].userid]
     );
-    res.status(200).send(`Successfully Saved ${toSave}`);
+    res.status(200).send(`Successfully Saved ${toSave}`); //Send valid code indicating successful save
   } catch (error) {
     console.error("error: /save", error);
     res.status(500).send("error: /save", error);
   }
 });
 app.get("/api/buildMyRecipes", async (req, res) => {
+  //Takes an email, queries DB for associated recipes, generates array of recipe objects and sends that to the client
   try {
+    //Request data, email
     let email = req.query.email;
-    console.log("building myRecipes for: " + email);
-    await pool.myPool
-      .query(`SELECT UserId FROM Users WHERE Email='${email}';`)
+    pool.myPool
+      .query(`SELECT UserId FROM Users WHERE Email='${email}';`) //Query DB for userID
       .then(async (data) => {
-        console.log(
-          "user pulled: " + email + " userID: " + data.rows[0].userid
-        );
-        let user = data.rows[0].userid;
-        await pool.myPool
-          .query(`SELECT videoid FROM user_recipes WHERE userId = '${user}';`)
+        let user = data.rows[0].userid; //userID result
+        pool.myPool
+          .query(`SELECT videoid FROM user_recipes WHERE userId = '${user}';`) //Query DB for all recipeIDs needed to build out their profile
           .then(async (data) => {
             let size = data.rows.length;
             let result = [];
             for (let i = 0; i < size; i++) {
               result[i] = data.rows[i].videoid;
-              console.log(`USER ${email} saved recipe found: ${result[i]}`);
             }
             if (result.length != 0) {
+              //if recipeIDs were found, generate an array of those recipes
               for (let i = 0; i < result.length; i++) {
                 let temp = result[i];
                 result[i] = await readJSON(
@@ -154,11 +152,11 @@ app.get("/api/buildMyRecipes", async (req, res) => {
                 );
                 result[i].videoId = temp;
               }
-              res.status(200).json(result);
+              res.status(200).json(result); //send JSON response to client with recipes
             } else {
               res
                 .status(200)
-                .json({ messsage: `'${email}': User has no recipes` });
+                .json({ messsage: `'${email}': User has no recipes` }); //respond with user has none!
             }
           });
       });
@@ -169,26 +167,27 @@ app.get("/api/buildMyRecipes", async (req, res) => {
 });
 
 app.delete("/api/delete", async (req, res) => {
+  //Takes an email and a recipeID, queries DB to delete the link between the email and the recipeID
   try {
-    //email and videoid sent in query, looks up userId in Postgre
-    //then DELETE's from user_recipes where userId = userId and videoId=videoId
+    //Request data, email and videoId
     let email = req.query.email;
     let videoId = req.query.id;
     let userId;
-    console.log(`deleting ${videoId} from user: ${email}`);
+    //Query DB for userId
     await pool.myPool
       .query(`SELECT userid FROM users WHERE email=$1`, [email])
       .then((data) => {
         userId = data.rows[0].userid;
       });
 
+    //Delete the recipeID from the user_recipes table associated with the userId
     await pool.myPool
       .query(`DELETE FROM user_recipes WHERE userid=$1 AND videoId=$2`, [
         userId,
         videoId,
       ])
       .then((data) => {
-        res.status(200).send(data); //probably don't need to send this
+        res.status(200).json(data); //Send confirmation
       });
   } catch (error) {
     console.error("api/delete error: ", error);
@@ -197,8 +196,9 @@ app.delete("/api/delete", async (req, res) => {
 });
 
 app.post("/api/update", async (req, res) => {
+  //Takes the recipeID of the old version and the new recipe, updates a new parse file with a new recipeID, if the recipe was saved to a profile already, update it in that profile
   try {
-    //receive updated recipe and the id and assign them to variables
+    //receive updated recipe object and the id and assign them to variables
     let body = req.body;
     let recipe = body.recipe;
     let recipeId = body.recipeId;
@@ -211,9 +211,14 @@ app.post("/api/update", async (req, res) => {
     fs.writeFileSync(fp, JSON.stringify(recipe));
     //find user's saved recipe (if applicable) and change the recipeId to the new id
     if (isAlreadySaved) {
-      let resp = await pool.myPool.query(
-        "UPDATE user_recipes SET videoid=$1 WHERE videoid=$2",
-        [newId, recipeId]
+      let userId = await pool.myPool
+        .query(`SELECT userid FROM users WHERE email=$1`, [body.email])
+        .then((data) => {
+          return data.rows[0].userid;
+        });
+      await pool.myPool.query(
+        "UPDATE user_recipes SET videoid=$1 WHERE videoid=$2 AND userid=$3",
+        [newId, recipeId, userId]
       );
     }
     //responsd to client with success code and new recipeid
@@ -228,7 +233,7 @@ app.post("/api/update", async (req, res) => {
 
 //UTILITY FUNCTIONS
 function isValidChar(aNumber) {
-  //filter out special characters for getNewId
+  //filter out special characters for getNewId, I just googled what the codes were and return false in those instances
   switch (aNumber) {
     case 58:
     case 59:
@@ -250,16 +255,18 @@ function isValidChar(aNumber) {
 }
 function getNewId() {
   let ans = "";
-  let number = Math.floor(Math.random() * 75 + 48);
+  let number = Math.floor(Math.random() * 75 + 48); //begin grabbing random characters
   while (ans.length < 8) {
     while (!isValidChar(number)) {
-      number = Math.floor(Math.random() * 75 + 48);
-    } //pick a random number between 0 and 1, scale that to between 0 and 75, add 48 to make it between 48 and 122
-    ans += String.fromCharCode(number);
-    number = Math.floor(Math.random() * 75 + 48);
+      //check if the first one grabbed was valid
+      number = Math.floor(Math.random() * 75 + 48); //if not, keep grabbing them until a valid one is grabbed
+      //to pick, pick a random number between 0 and 1, scale that to between 0 and 75, add 48 to make it between 48 and 122 which covers digits, upper/lower case alphabet and some special characters
+    }
+    ans += String.fromCharCode(number); //append to id
+    number = Math.floor(Math.random() * 75 + 48); //grab a new char
   }
   if (fs.existsSync(`./outputFiles/parseFiles/pase-${ans}.txt`)) {
-    ans = getNewId();
+    return (ans = getNewId()); //if we somehow generate an id that already exists, recurse
   } else {
     return ans;
   }
@@ -282,6 +289,7 @@ async function startGeneration(aUrl) {
   }
 }
 async function readJSON(aFilePath) {
+  //Reads a file from aFilePath and processes the bytes with JSON.parse()
   return new Promise((resolve, reject) => {
     let jsonData = "";
     fs.readFile(aFilePath, (error, data) => {
@@ -296,6 +304,7 @@ async function readJSON(aFilePath) {
   });
 }
 function checkIfParseFileExists(aURL) {
+  //Checks for the existence of a ParseFileFile, used to determine whether or not a recipe gets generated.
   let dir = fs.readdirSync("./outputFiles/parseFiles");
   for (let i = 0; i < dir.length; i++) {
     let idOfFile = dir[i].match(/parse-(.+)\./);

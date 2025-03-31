@@ -1,0 +1,12 @@
+#cards-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    justify-content: center;
+
+}
+
+.cards {
+    margin-top: 2em;
+    grid-column-start: auto;
+    grid-column-end: span 1;
+}

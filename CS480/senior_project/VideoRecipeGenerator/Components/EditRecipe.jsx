@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { FormGroup, FormLabel } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
+import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 import Form from 'react-bootstrap/Form';
+import useIsAuthenticated from 'react-auth-kit/hooks/useIsAuthenticated';
 //https://www.freecodecamp.org/news/clone-an-object-in-javascript/
 export default function EditRecipe(props) {
 
@@ -9,6 +11,8 @@ export default function EditRecipe(props) {
     const [workingRecipeIngredients, updateWorkingRecipeIngredients] = useState(recipe.ingredients);
     const [workingRecipeInstructions, updateWorkingRecipeInstructions] = useState(recipe.instructions);
     const [changesMade, changesWereMade] = useState(false);
+    const isAuthenticated = useIsAuthenticated();
+    const user = useAuthUser();
     console.log("isAlreadySaved:", isAlreadySaved);
     const handleSubmit = (e) => {
         //Eventually, alert before saving that overwrite's are final and permanent
@@ -17,14 +21,22 @@ export default function EditRecipe(props) {
         //This needs to fetch() an api POST destination and provide new recipe JSON as well as recipeId
         recipe.ingredients = workingRecipeIngredients;
         recipe.instructions = workingRecipeInstructions;
-        fetch("http://localhost:5000/api/update", {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
+        let body = isAuthenticated ?
+            JSON.stringify({
+                "email": user.name,
                 "recipe": recipe,
                 "recipeId": recipeId,
                 "isAlreadySaved": isAlreadySaved
-            })
+            }) : JSON.stringify({
+                "recipe": recipe,
+                "recipeId": recipeId,
+                "isAlreadySaved": isAlreadySaved
+            });
+
+        fetch("http://localhost:5000/api/update", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: body
         }).then(
             async (res) => {
                 if (res.ok) {
