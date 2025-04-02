@@ -13,16 +13,16 @@ export default function Home() {
   let mainFormPlaceHolder = "Paste Youtube or TikTok URL Here...";
   let mainFormText = "Works with valid Youtube and TikTok URLs";
   let submitButtonText = "Create Recipe 🍽";
-  async function sleep() {
+  async function sleep(aValue) {
     return new Promise(resolve => {
-      setTimeout(resolve, 100);
+      setTimeout(resolve, aValue);
     })
   }
   async function animateProgressBar(start, end) {
     for (let i = start; i <= end; i++) {
 
       setProgress(i);
-      await sleep();
+      await sleep(250);
     }
   }
 
@@ -31,18 +31,17 @@ export default function Home() {
     animateProgressBar(0, 75);
     event.preventDefault();
     try {
+
       const response = await fetch('http://localhost:5000/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: newURL })
-      }
-      );
-      if (!response.ok) throw new Error(data.status + " " + data.error)
+      });
+      if (!response.ok) throw new Error(response.status + " " + response.error)
       animateProgressBar(75, 99);
+      await sleep(3000);
       console.log("home.jsx: POST Sent for: ", newURL);
       let data = await response.json();
-
-      //setRecipe(data.recipe);
       console.log('home.jsx: here is data: ', data);
       console.log('home.jsx:', data.data);
       console.log('home.jsx:', data.id);

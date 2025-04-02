@@ -8,7 +8,7 @@ import jwt from "jsonwebtoken";
 import MyPool from "./config/db.js";
 import GeminiParser from "./src/GeminiParser.js";
 import TikTokDownloader from "./src/TikTokDownloader.js";
-import CleanUp from "./src/cleanup.js";
+import CleanUp from "./src/CleanUp.js";
 
 //INTERNALS
 const app = express();

@@ -36,9 +36,9 @@ export default function Recipe(props) {
         } else {
             return (
 
-                <>
+                <div id="container">
 
-                    <h2 className="printable" id='name'>{toRender.name}</h2>
+                    <h2 className="printable" id="name">{toRender.name}</h2>
 
                     <Button variant='secondary' type='button' onClick={handlePrinting}>Print This</Button>
 
@@ -47,28 +47,28 @@ export default function Recipe(props) {
                     {isAuthenticated ?
                         (isSaved || isAlreadySaved ? <p>Saved to My Recipes</p> : <Button variant='secondary' type='button' onClick={SaveToMyRecipes}>Save To My Recipes</Button>)
                         : null}
-                    <main className="gridContainer printable">
-                        <div className="Ing">
+                    <div className="gridContainer printable">
+                        <div >
                             <h3>Ingredients:</h3>
 
                             <ul>
                                 {toRender.ingredients.map((ingredient, index) => {
-                                    return (<li key={index} >{ingredient.ingredient} : {ingredient.amount}</li>) //https://react.dev/learn/rendering-lists#why-does-react-need-keys, use of index key here should be okay because these arrays are static in size
+                                    return (<li className="ing" key={index} >{ingredient.ingredient} : {ingredient.amount}</li>) //https://react.dev/learn/rendering-lists#why-does-react-need-keys, use of index key here should be okay because these arrays are static in size
                                 })}
                             </ul>
                         </div>
-                        <div className="Ins">
+                        <div >
                             <h3>Instructions: </h3>
                             <ul>
                                 {
                                     toRender.instructions.map((instruction, index) => {
-                                        return (<li key={index}>{instruction.instruction}</li>)
+                                        return (<li className="ins" key={index}>{instruction.instruction}</li>)
                                     })
                                 }
                             </ul>
                         </div>
-                    </main>
-                </>
+                    </div>
+                </div>
             )
         }
     } else {
