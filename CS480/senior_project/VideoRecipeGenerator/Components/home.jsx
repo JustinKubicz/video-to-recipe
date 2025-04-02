@@ -38,15 +38,14 @@ export default function Home() {
         body: JSON.stringify({ url: newURL })
       });
       if (!response.ok) throw new Error(response.status + " " + response.error)
-      animateProgressBar(75, 99);
-      await sleep(3000);
+      await animateProgressBar(75, 99);
       console.log("home.jsx: POST Sent for: ", newURL);
       let data = await response.json();
       console.log('home.jsx: here is data: ', data);
       console.log('home.jsx:', data.data);
       console.log('home.jsx:', data.id);
       setRecipeId(data.id);
-      animateProgressBar(99, 100);
+      await animateProgressBar(99, 100);
       setIsLoading(false);
       setRecipe(data.data);
     } catch (error) {
