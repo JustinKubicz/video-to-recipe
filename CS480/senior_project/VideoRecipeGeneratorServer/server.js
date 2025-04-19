@@ -132,11 +132,11 @@ app.get("/api/buildMyRecipes", async (req, res) => {
     //Request data, email
     let email = req.query.email;
     pool.myPool
-      .query(`SELECT UserId FROM Users WHERE Email='${email}';`) //Query DB for userID
+      .query(`SELECT UserId FROM Users WHERE Email=$1;`, [email]) //Query DB for userID
       .then(async (data) => {
         let user = data.rows[0].userid; //userID result
         pool.myPool
-          .query(`SELECT videoid FROM user_recipes WHERE userId = '${user}';`) //Query DB for all recipeIDs needed to build out their profile
+          .query(`SELECT videoid FROM user_recipes WHERE userId =$1;`, [user]) //Query DB for all recipeIDs needed to build out their profile
           .then(async (data) => {
             let size = data.rows.length;
             let result = [];
