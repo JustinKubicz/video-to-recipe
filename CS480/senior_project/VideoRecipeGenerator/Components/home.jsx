@@ -19,11 +19,15 @@ export default function Home() {
     })
   }
   async function animateProgressBar(start, end) {
-    for (let i = start; i <= end; i++) {
+    return new Promise(async (resolve, reject) => {
+      for (let i = start; i <= end; i++) {
 
-      setProgress(i);
-      await sleep(250);
-    }
+        setProgress(i);
+        await sleep(125);
+      }
+      resolve();
+    })
+
   }
 
   async function handleSub(event) {
@@ -41,8 +45,7 @@ export default function Home() {
       await animateProgressBar(75, 99);
       console.log("home.jsx: POST Sent for: ", newURL);
       let data = await response.json();
-      console.log('home.jsx: here is data: ', data);
-      console.log('home.jsx:', data.data);
+      console.log('home.jsx: data received: ', data.data);
       console.log('home.jsx:', data.id);
       setRecipeId(data.id);
       await animateProgressBar(99, 100);

@@ -9,11 +9,10 @@ import { useState } from "react";
 export default function SignIn() {
   const signIn = useSignIn();
   const [formData, setFormData] = useState({ email: '', password: '' });
-  const [emailMessage, setEmailMessage] = useState("Please enter email");
+  const [emailMessage, setEmailMessage] = useState("Please enter email.");
   const [passMessage, setPassMessage] = useState("Please enter password.");
   const [passIsVisible, setPassVisibility] = useState(false);
   const onSubmit = async (e) => {
-    //https://authkit.arkadip.dev/reference/react-auth-kit/hooks/useSignIn/#signinconfig-parameters
     e.preventDefault()
     fetch('http://localhost:5000/api/login', {
       method: 'POST',
@@ -32,7 +31,7 @@ export default function SignIn() {
           },
           userState: {
             name: formData.email,
-            uid: `123456`
+            // uid: `123456`//this needs to change. 
           }
 
         });
@@ -48,6 +47,7 @@ export default function SignIn() {
       } else if (res.status == 401) {
         //wrong password
         setPassMessage("Incorrect Password");
+
       } else {
         let message = await res.text();
         throw new Error(res.status + ": " + message);

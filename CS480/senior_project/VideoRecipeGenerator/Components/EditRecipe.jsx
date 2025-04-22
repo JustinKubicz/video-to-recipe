@@ -4,7 +4,7 @@ import Button from 'react-bootstrap/Button';
 import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 import Form from 'react-bootstrap/Form';
 import useIsAuthenticated from 'react-auth-kit/hooks/useIsAuthenticated';
-//https://www.freecodecamp.org/news/clone-an-object-in-javascript/
+
 export default function EditRecipe(props) {
 
     const { recipeId, recipe, isAlreadySaved, updateEditMode, updateId } = props;
@@ -15,10 +15,8 @@ export default function EditRecipe(props) {
     const user = useAuthUser();
     console.log("isAlreadySaved:", isAlreadySaved);
     const handleSubmit = (e) => {
-        //Eventually, alert before saving that overwrite's are final and permanent
-        console.log("handle sub called");
         e.preventDefault();
-        //This needs to fetch() an api POST destination and provide new recipe JSON as well as recipeId
+
         recipe.ingredients = workingRecipeIngredients;
         recipe.instructions = workingRecipeInstructions;
         let body = isAuthenticated ?
@@ -40,8 +38,6 @@ export default function EditRecipe(props) {
         }).then(
             async (res) => {
                 if (res.ok) {
-                    //Then, receive confirmation from backend, and redirect to MyRecipes if the recipe was already saved
-                    //otherwise, redirect to home component with new recipe as default recipe
                     if (isAlreadySaved) {
                         updateEditMode(false);
                     } else {

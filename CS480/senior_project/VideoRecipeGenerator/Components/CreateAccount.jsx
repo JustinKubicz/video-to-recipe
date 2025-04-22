@@ -7,7 +7,7 @@ export default function Create() {
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [accountCreated, updateAccountCreate] = useState(false);
     const [passwordMessage, setPassMessage] = useState("Please Enter Password");
-    const [arePassRequirementsMet, passRequirementsMet] = useState(false);
+    const [passRequirementsMet, passRequirementsAreMet] = useState(false);
     const [passIsVisible, setPassVisibility] = useState(false);
     const [emailMessage, setEmailMessage] = useState("Please Enter a Valid Email Address");
     let requirements =
@@ -84,9 +84,9 @@ export default function Create() {
                     }
                 }
                 if (met == 3) {
-                    passRequirementsMet(true);
+                    passRequirementsAreMet(true);
                 } else {
-                    passRequirementsMet(false);
+                    passRequirementsAreMet(false);
                 }
                 setPassMessage(ans);
 
@@ -94,7 +94,7 @@ export default function Create() {
                 for (let i = 0; i < requirements.length; i++) {
                     requirements[i].character == '⊗';
                 }
-                passRequirementsMet(false);
+                passRequirementsAreMet(false);
             }
         }, [formData.password]
     )
@@ -137,7 +137,7 @@ export default function Create() {
 
             {accountCreated ?
                 <Link to="/SignIn">Account Created, Please Sign In, Click Here</Link> :
-                (arePassRequirementsMet ?
+                (passRequirementsMet ?
                     <div>
                         <Button variant="primary" type="submit">
                             Sign-Up
