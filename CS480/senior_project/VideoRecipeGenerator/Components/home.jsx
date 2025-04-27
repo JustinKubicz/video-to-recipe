@@ -29,7 +29,6 @@ export default function Home() {
     })
 
   }
-
   async function handleSub(event) {
     setIsLoading(true);
     animateProgressBar(0, 75);
@@ -55,7 +54,6 @@ export default function Home() {
       console.error('Error processing video:', error);
     }
   };
-
   return (
     <>
       <Form onSubmit={handleSub}>

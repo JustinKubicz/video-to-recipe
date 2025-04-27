@@ -1,4 +1,5 @@
 import { execSync, exec } from "child_process";
+//Simple script to auto install yt-dlp if it's not already, requires python, throws an error if there's no PIP
 //https://nodejs.org/api/child_process.html#child_processexecsynccommand-options
 exec("yt-dlp --version", (error, stdout) => {
   if (error) {
