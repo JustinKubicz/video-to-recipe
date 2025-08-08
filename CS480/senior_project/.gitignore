@@ -1,4 +1,0 @@
-# Ignore all node_modules directories
-VideoRecipeGenerator/node_modules/
-VideoRecipeGeneratorServer/node_modules/
-VideoRecipeGeneratorServer/outputFiles/
