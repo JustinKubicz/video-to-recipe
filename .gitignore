@@ -2,3 +2,4 @@
 VideoRecipeGenerator/node_modules/
 VideoRecipeGeneratorServer/node_modules/
 VideoRecipeGeneratorServer/outputFiles/
+VideoRecipeGeneratorServer/.env
